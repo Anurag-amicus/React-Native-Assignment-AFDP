@@ -1,65 +1,53 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import {FlatList,StyleSheet, Text,View } from "react-native";
+import { ProductCard } from "@/components/products/ProductCard";
 import productdata from "../data/products.json"
 
 export default function HomeScreen() {
-  const handleGetStarted = () => {
-    console.log("Welcome to React Native!");
-  };
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome! To Online Express</Text>
-
-      <Text style={styles.description}>
-        Discover quality products designed to fit your everyday needs across
-        electronics, fashion, home, and more.
-      </Text>
-
-      <Pressable
-        style={styles.button}
-        onPress={handleGetStarted}
-        accessibilityRole="button"
-      >
-        <Text style={styles.buttonText}>Get Started</Text>
-      </Pressable>
+  const renderHeader = () => (
+    <View style={styles.header}>
+      <Text style={styles.title}>Online Express</Text>
     </View>
+  );
+  return (
+    <FlatList
+      data={productdata}
+      keyExtractor={(item) => item.id.toString()}
+      numColumns={2}
+      columnWrapperStyle={styles.row} 
+      contentContainerStyle={styles.listContainer}
+      ListHeaderComponent={renderHeader}
+      renderItem={({ item }) => (
+        <View style={styles.cardWrapper}>
+          <ProductCard {...item} />
+        </View>
+      )}
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
+  listContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 32,
+  },
+  header: {
     alignItems: "center",
-    paddingHorizontal: 24,
-    backgroundColor: "#ffffff",
+    marginBottom: 20,
+    marginTop: 40,
+    borderRadius: 12,
+    backgroundColor: "#1087FD"
   },
-
-  title: {
-    fontSize: 30,
-    fontWeight: "bold",
-    textAlign: "center",
-    color: "#111111",
-    marginBottom: 12,
+  title:{
+    fontSize:24,
+    fontWeight:500,
+    color:"#ffffff",
+    padding:5
   },
-
-  description: {
-    fontSize: 16,
-    color: "#666666",
-    textAlign: "center",
-    marginBottom: 28,
+  row: {
+    justifyContent: "space-between", 
+    gap: 12,
   },
-
-  button: {
-    backgroundColor: "#ff5405",
-    paddingVertical: 14,
-    paddingHorizontal: 32,
-    borderRadius: 8,
-  },
-
-  buttonText: {
-    color: "#ffffff",
-    fontSize: 16,
-    fontWeight: "bold",
+  cardWrapper: {
+    flex: 1, 
   },
 });

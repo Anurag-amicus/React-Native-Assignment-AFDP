@@ -11,14 +11,14 @@ export default function Button({ title, onPress, style ,variant = "primary" } : 
 
 const styles = StyleSheet.create({
   button: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
+    paddingVertical: 6,
+    paddingHorizontal: 18,
     borderRadius: 8,
     alignItems: "center", 
     justifyContent: "center",
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: "600",
   },
 });

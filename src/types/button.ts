@@ -12,7 +12,7 @@ export type ButtonProps = {
 // Container styles for each variant
 export const variantButtonStyles: Record<ButtonVariant, ViewStyle> = {
   primary: {
-    backgroundColor: "#ff5405",
+    backgroundColor: "#1087FD",
   },
   secondary: {
     backgroundColor: "#222222",
@@ -20,7 +20,7 @@ export const variantButtonStyles: Record<ButtonVariant, ViewStyle> = {
   outline: {
     backgroundColor: "transparent",
     borderWidth: 1.5,
-    borderColor: "#ff5405",
+    borderColor: "#1087FD",
   },
 };
 
