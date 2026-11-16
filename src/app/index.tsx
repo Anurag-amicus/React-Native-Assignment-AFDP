@@ -1,53 +1,65 @@
-import {FlatList,StyleSheet, Text,View } from "react-native";
+import { FlatList, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ProductCard } from "@/components/products/ProductCard";
-import productdata from "../data/products.json"
+import productdata from "../data/products.json";
 
 export default function HomeScreen() {
-  const renderHeader = () => (
-    <View style={styles.header}>
-      <Text style={styles.title}>Online Express</Text>
-    </View>
-  );
+  const insets = useSafeAreaInsets();
+
   return (
-    <FlatList
-      data={productdata}
-      keyExtractor={(item) => item.id.toString()}
-      numColumns={2}
-      columnWrapperStyle={styles.row} 
-      contentContainerStyle={styles.listContainer}
-      ListHeaderComponent={renderHeader}
-      renderItem={({ item }) => (
-        <View style={styles.cardWrapper}>
-          <ProductCard {...item} />
-        </View>
-      )}
-    />
+    <View style={styles.container}>
+      <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
+        <Text style={styles.title}>Our Products</Text>
+      </View>
+      <FlatList
+        data={productdata}
+        keyExtractor={(item) => item.id.toString()}
+        numColumns={2}
+        columnWrapperStyle={styles.row}
+        contentContainerStyle={styles.listContainer}
+        renderItem={({ item }) => (
+          <View style={styles.cardWrapper}>
+            <ProductCard {...item} />
+          </View>
+        )}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  listContainer: {
-    paddingHorizontal: 16,
-    paddingBottom: 32,
+  container: {
+    flex: 1,
+    backgroundColor: "#ffffff",
   },
   header: {
+    width: "100%", 
+    backgroundColor: "#1087FD",
+    paddingBottom: 16,
+    paddingHorizontal: 20,
     alignItems: "center",
-    marginBottom: 20,
-    marginTop: 40,
-    borderRadius: 12,
-    backgroundColor: "#1087FD"
+    justifyContent: "center",
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
-  title:{
-    fontSize:24,
-    fontWeight:500,
-    color:"#ffffff",
-    padding:5
+  title: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#ffffff",
+  },
+  listContainer: {
+    paddingHorizontal: 16,
+    paddingTop: 16, // Space between fixed header and first cards
+    paddingBottom: 32,
   },
   row: {
-    justifyContent: "space-between", 
+    justifyContent: "space-between",
     gap: 12,
   },
   cardWrapper: {
-    flex: 1, 
+    flex: 1,
   },
 });

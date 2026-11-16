@@ -1,6 +1,6 @@
 import Card from "../common/Card";
 import Button from "../common/Button";
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, Alert } from "react-native";
 import type { Product } from "@/types/product";
 import { Ionicons }  from "@react-native-vector-icons/ionicons"
 
@@ -13,6 +13,11 @@ export function ProductCard({
 }: Product) {
   const onAddtoCart = () => {
     console.log(`Added ${name} to cart`);
+    Alert.alert(
+      "Added to Cart",
+      `${name} has been added to your cart for ₹${price.toLocaleString()}!`,
+      [{ text: "OK" }]
+    );
   };
   return (
     <Card variant="elevated" style={styles.card}>
