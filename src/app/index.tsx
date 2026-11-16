@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import productdata from "../data/products.json"
 
 export default function HomeScreen() {
   const handleGetStarted = () => {
