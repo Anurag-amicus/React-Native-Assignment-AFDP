@@ -1,56 +1,100 @@
-# Welcome to your Expo app 👋
+# Online Express — React Native Assignments
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A modern e-commerce mobile application built with **React Native**, **Expo Router**, and **TypeScript**.
 
-## Get started
+---
 
-1. Install dependencies
+## 📋 Assignment Overview
 
-   ```bash
-   npm install
-   ```
+### Assignment 1 — Setup & Hello React Native
 
-2. Start the app
+#### Problem Statement
+Set up a new React Native application using Expo with TypeScript. Create a Welcome screen with an app title, description, and button. Clicking the button should log a message to the console.
 
-   ```bash
-   npx expo start
-   ```
+#### Key Deliverables & Implementation
+- **Project Setup:** Initialized an Expo project with TypeScript and file-based routing (`expo-router`).
+- **Welcome Screen UI:** Built a clean landing screen displaying the store title (*"Online Express"*), an introductory description, and action buttons.
+- **Button Interaction:** Implemented a `<Pressable>` button that logs `"Welcome to React Native!"` to the console upon pressing.
+- **Routing & Navigation:** Preserved the Welcome Screen at `src/app/welcome.tsx` with an additional navigation button to browse products (`router.push("/")`).
 
-In the output, you'll find options to open the app in a
+**Relevant Files:**
+- [`src/app/welcome.tsx`](src/app/welcome.tsx) (Initial commit: `371d14b`)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### Assignment 2 — Product Card Component & Grid Listing
 
-## Get a fresh project
+#### Problem Statement
+Create a reusable `ProductCard` component with an image, title, price, rating, and an "Add to Cart" button using React Native components and `StyleSheet`. Display 4+ cards in a responsive layout with TypeScript typing.
 
-When you're ready, run:
+#### Key Deliverables & Implementation
 
-```bash
-npm run reset-project
+1. **Reusable Core Components:**
+   - **`Card` ([`src/components/common/Card.tsx`](src/components/common/Card.tsx)):** Reusable container supporting multiple variants (`elevated`, `outlined`, `flat`) using `variantCardStyles`.
+   - **`Button` ([`src/components/common/Button.tsx`](src/components/common/Button.tsx)):** Reusable button supporting multiple variants (`primary`, `secondary`, `outline`) managing container and text contrast styles.
+
+2. **TypeScript Strict Typing:**
+   - [`src/types/product.ts`](src/types/product.ts): Defines the `Product` data model (`id`, `name`, `category`, `price`, `rating`, `imageUrl`).
+   - [`src/types/card.ts`](src/types/card.ts): Strongly typed `CardProps` and `CardVariant`.
+   - [`src/types/button.ts`](src/types/button.ts): Strongly typed `ButtonProps` and `ButtonVariant`.
+
+3. **Product Card Component ([`src/components/products/ProductCard.tsx`](src/components/products/ProductCard.tsx)):**
+   - Composes the reusable `Card` and `Button` components.
+   - Remote image loading with `resizeMode="cover"` and rounded corner clipping (`overflow: "hidden"`).
+   - Category tag and single-line truncated title (`numberOfLines={1}`).
+   - Formatted INR price display (`₹{price.toLocaleString()}`).
+   - Star rating row using `@react-native-vector-icons/ionicons` vertically centered with the rating score and review count.
+   - "Add to Cart" interaction displaying a native feedback alert (`Alert.alert`) and logging the action.
+
+4. **Responsive 2-Column Grid Layout ([`src/app/index.tsx`](src/app/index.tsx)):**
+   - Uses React Native's performant, virtualized `<FlatList>` with `numColumns={2}`.
+   - Row spacing handled via `columnWrapperStyle` and equal card distribution with `flex: 1`.
+   - Displays 8 products from [`src/data/products.json`](src/data/products.json).
+
+5. **Fixed Full-Width App Header:**
+   - Fixed header at the top outside of the scrollable list.
+   - Integrated with `useSafeAreaInsets` from `react-native-safe-area-context` for seamless notch and status bar spacing on iOS and Android.
+
+---
+
+## 📁 Project Structure
+
+```text
+src/
+├── app/
+│   ├── _layout.tsx              # Root Stack navigation layout
+│   ├── index.tsx                # Assignment 2: Product grid screen with fixed header
+│   └── welcome.tsx              # Assignment 1: Welcome screen
+├── components/
+│   ├── common/
+│   │   ├── Button.tsx           # Reusable Button component with variants
+│   │   └── Card.tsx             # Reusable Card container with variants
+│   └── products/
+│       └── ProductCard.tsx      # Composed ProductCard component
+├── data/
+│   └── products.json            # Mock product catalogue (8 items)
+└── types/
+    ├── button.ts                # Button type definitions & variant styles
+    ├── card.ts                  # Card type definitions & variant styles
+    └── product.ts               # Product interface definition
 ```
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+---
 
-### Other setup steps
+## 🚀 Getting Started
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+### 1. Install Dependencies
+```bash
+npm install
+```
 
-## Learn more
+### 2. Start the Development Server
+```bash
+npx expo start
+```
 
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+### 3. Open the App
+- Scan the QR code using **Expo Go** on Android or iOS.
+- Press `a` to open in an Android Emulator.
+- Press `i` to open in an iOS Simulator.
+- Press `w` to run on Web.
