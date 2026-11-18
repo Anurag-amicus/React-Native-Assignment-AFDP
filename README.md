@@ -8,26 +8,28 @@ A modern e-commerce mobile application built with **React Native**, **Expo Route
 
 ### Assignment 1 — Setup & Hello React Native
 
-#### Problem Statement
+**Problem Statement:**
 Set up a new React Native application using Expo with TypeScript. Create a Welcome screen with an app title, description, and button. Clicking the button should log a message to the console.
 
-#### Key Deliverables & Implementation
+**Key Deliverables & Implementation:**
+
 - **Project Setup:** Initialized an Expo project with TypeScript and file-based routing (`expo-router`).
-- **Welcome Screen UI:** Built a clean landing screen displaying the store title (*"Online Express"*), an introductory description, and action buttons.
+- **Welcome Screen UI:** Built a clean landing screen displaying the store title (_"Online Express"_), an introductory description, and action buttons.
 - **Button Interaction:** Implemented a `<Pressable>` button that logs `"Welcome to React Native!"` to the console upon pressing.
 - **Routing & Navigation:** Preserved the Welcome Screen at `src/app/welcome.tsx` with an additional navigation button to browse products (`router.push("/")`).
 
 **Relevant Files:**
+
 - [`src/app/welcome.tsx`](src/app/welcome.tsx) (Initial commit: `371d14b`)
 
 ---
 
 ### Assignment 2 — Product Card Component & Grid Listing
 
-#### Problem Statement
+**Problem Statement:**
 Create a reusable `ProductCard` component with an image, title, price, rating, and an "Add to Cart" button using React Native components and `StyleSheet`. Display 4+ cards in a responsive layout with TypeScript typing.
 
-#### Key Deliverables & Implementation
+**Key Deliverables & Implementation:**
 
 1. **Reusable Core Components:**
    - **`Card` ([`src/components/common/Card.tsx`](src/components/common/Card.tsx)):** Reusable container supporting multiple variants (`elevated`, `outlined`, `flat`) using `variantCardStyles`.
@@ -57,6 +59,27 @@ Create a reusable `ProductCard` component with an image, title, price, rating, a
 
 ---
 
+### Assignment 3 — Reusable Button & Card Library
+
+**Problem Statement:**
+Build reusable Button and Card components with multiple variants, sizes and disabled states.
+
+**Key Deliverables & Implementation:**
+
+1. **Enhanced Button Component ([`src/components/common/Button.tsx`](src/components/common/Button.tsx)):**
+   - **5 Variants:** `primary`, `secondary`, `outline`, `danger`, and `generic` with coordinated container and text contrast styles.
+   - **3 Sizes:** `small` (12px text / compact padding), `medium` (14px text / standard), and `large` (16px text / spacious padding).
+   - **Disabled State:** `disabled?: boolean` prop that dims opacity (`0.5`), disables interactions, and sets accessible screen reader states.
+   - **Flexible Children/Title:** Supports passing either `title="Label"` or nested `children` (icons, spinners, custom text).
+   - **Tactile Pressed Feedback:** Smooth scale and opacity reduction on touch (`{ scale: 0.98 }`).
+   - **Routing Link:** Built-in `href` prop utilizing Expo Router's `<Link asChild>`.
+
+2. **Enhanced Card Component ([`src/components/common/Card.tsx`](src/components/common/Card.tsx)):**
+   - **Variants:** `elevated` (3D shadow depth), `bordered` / `outlined` (2px boundary border), and `flat` (subtle surface background).
+   - Clean container accepting custom layout and styling overrides.
+
+---
+
 ## 📁 Project Structure
 
 ```text
@@ -67,15 +90,18 @@ src/
 │   └── welcome.tsx              # Assignment 1: Welcome screen
 ├── components/
 │   ├── common/
-│   │   ├── Button.tsx           # Reusable Button component with variants
-│   │   └── Card.tsx             # Reusable Card container with variants
+│   │   ├── Button.tsx           # Reusable Button component (variants, sizes, disabled)
+│   │   └── Card.tsx             # Reusable Card container (variants)
+│   ├── layout/
+│   │   ├── Footer.tsx           # Scrollable footer with library link
+│   │   └── Header.tsx           # Fixed full-width app header
 │   └── products/
 │       └── ProductCard.tsx      # Composed ProductCard component
 ├── data/
 │   └── products.json            # Mock product catalogue (8 items)
 └── types/
-    ├── button.ts                # Button type definitions & variant styles
-    ├── card.ts                  # Card type definitions & variant styles
+    ├── button.ts                # Button types, sizes, variants & styles
+    ├── card.ts                  # Card & CtaCard types, variants & styles
     └── product.ts               # Product interface definition
 ```
 
@@ -84,16 +110,19 @@ src/
 ## 🚀 Getting Started
 
 ### 1. Install Dependencies
+
 ```bash
 npm install
 ```
 
 ### 2. Start the Development Server
+
 ```bash
 npx expo start
 ```
 
 ### 3. Open the App
+
 - Scan the QR code using **Expo Go** on Android or iOS.
 - Press `a` to open in an Android Emulator.
 - Press `i` to open in an iOS Simulator.
