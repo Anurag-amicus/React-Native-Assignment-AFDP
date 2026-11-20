@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { StyleProp, ViewStyle } from "react-native";
-import type { ButtonVariant } from "./button";
+import { colors } from "@/theme/colors";
 
 export type CardVariant = "elevated" | "bordered" | "outlined" | "flat";
 
@@ -12,31 +12,31 @@ export interface CardProps {
 
 export const variantCardStyles: Record<CardVariant, ViewStyle> = {
   elevated: {
-    backgroundColor: "#ffffff",
+    backgroundColor: colors.white,
     borderWidth: 1,
-    borderColor: "#f0f0f0",
-    elevation: 4,
+    borderColor: colors.border,
+    elevation: 3,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.12,
-    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
   },
   bordered: {
-    backgroundColor: "#ffffff",
+    backgroundColor: colors.white,
     borderWidth: 2,
-    borderColor: "#e5e7eb",
+    borderColor: colors.border,
     elevation: 0,
   },
   outlined: {
-    backgroundColor: "#ffffff",
+    backgroundColor: colors.white,
     borderWidth: 1.5,
-    borderColor: "#e5e7eb",
+    borderColor: colors.border,
     elevation: 0,
   },
   flat: {
-    backgroundColor: "#f9fafb",
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: "#f3f4f6",
+    borderColor: colors.border,
     elevation: 0,
   },
 };

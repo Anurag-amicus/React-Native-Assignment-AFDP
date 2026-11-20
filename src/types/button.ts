@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { StyleProp, ViewStyle, TextStyle } from "react-native";
 import type { Href } from "expo-router";
+import { colors } from "@/theme/colors";
 
 export type ButtonVariant = "primary" | "secondary" | "outline" | "danger" | "generic";
 export type ButtonSize = "small" | "medium" | "large";
@@ -20,19 +21,19 @@ export type ButtonProps = {
 // Container styles for each variant
 export const variantButtonStyles: Record<ButtonVariant, ViewStyle> = {
   primary: {
-    backgroundColor: "#1087FD",
-    borderColor: "#1087FD",
+    backgroundColor: colors.orange,
+    borderColor: colors.orange,
     borderWidth: 1.5,
   },
   secondary: {
-    backgroundColor: "#ffffff",
-    borderColor: "#222222",
+    backgroundColor: colors.white,
+    borderColor: colors.black,
     borderWidth: 1.5,
   },
   outline: {
     backgroundColor: "transparent",
     borderWidth: 1.5,
-    borderColor: "#1087FD",
+    borderColor: colors.orange,
   },
   danger: {
     backgroundColor: "#dc2626",
@@ -48,19 +49,19 @@ export const variantButtonStyles: Record<ButtonVariant, ViewStyle> = {
 // Text color styles for each variant
 export const variantButtonTextStyles: Record<ButtonVariant, TextStyle> = {
   primary: {
-    color: "#ffffff",
+    color: colors.white,
   },
   secondary: {
-    color: "#222222",
+    color: colors.black,
   },
   outline: {
-    color: "#1087FD",
+    color: colors.orange,
   },
   danger: {
-    color: "#ffffff",
+    color: colors.white,
   },
   generic: {
-    color: "#333333",
+    color: colors.charcoal,
   },
 };
 
@@ -74,12 +75,12 @@ export const sizeButtonStyles: Record<ButtonSize, ViewStyle> = {
   medium: {
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 8,
+    borderRadius: 6,
   },
   large: {
     paddingVertical: 14,
     paddingHorizontal: 28,
-    borderRadius: 10,
+    borderRadius: 8,
   },
 };
 
