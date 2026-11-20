@@ -103,13 +103,43 @@ Build quantity selector with + and - buttons, dynamic total calculation and Add 
 
 ---
 
+### Assignment 5 — Mini Product List Screen with Filters & Search
+
+**Problem Statement:**
+Create FlatList-based product listing with category filters and product count.
+
+**Key Deliverables & Implementation:**
+
+1. **Collapsible Mobile Filter Sidebar ([`src/components/products/filters/FilterSidebar.tsx`](src/components/products/filters/FilterSidebar.tsx)):**
+   - Full mobile port of Next.js `Sidebar.tsx` with an interactive collapsible accordion (`FILTERS +/−`).
+   - Integrates 5 sub-filter modules:
+     - **Category Filter:** Multiple categories with active checkbox states and dynamic "More / Less" expansion.
+     - **Brand Filter:** Brand options with checkboxes and "More / Less" expansion.
+     - **Price Filter:** Bounded price ranges (`₹0 - ₹10,000`, `₹10,000 - ₹50,000`, etc.).
+     - **Rating Filter:** Star threshold options (`★★★★ & above`, `★★★ & above`).
+     - **Sort Filter:** Multi-field sorting (`Name`, `Price`, `Ratings`) with expandable directions (`A → Z`, `Low to High`, etc.) and a clear `×` button.
+
+2. **Real-Time Search Bar ([`src/components/layout/SearchBar.tsx`](src/components/layout/SearchBar.tsx)):**
+   - Live search input with instant filtering across product names, categories, and brands, featuring a quick-clear button.
+
+3. **Dynamic Results Count Bar ([`src/components/products/ProductCountBar.tsx`](src/components/products/ProductCountBar.tsx)):**
+   - Live results counter displaying `"Showing X of Y results"`, active query terms, and current sort direction.
+
+4. **Async Service Architecture ([`src/services/productService.ts`](src/services/productService.ts)):**
+   - Future-ready API layer with `getProducts(params)`, `getCategories()`, and `getBrands()`, decoupling UI components from the underlying data source.
+
+5. **Integrated Product Grid ([`src/app/index.tsx`](src/app/index.tsx)):**
+   - 2-column virtualized `<FlatList>` with sticky `<Header />`, collapsible filter accordion, product count status, and clean empty state (`"No products found"`).
+
+---
+
 ## 📁 Project Structure
 
 ```text
 src/
 ├── app/
 │   ├── _layout.tsx              # Root Stack navigation layout
-│   ├── index.tsx                # Assignment 2: Product grid screen with fixed header
+│   ├── index.tsx                # Product listing screen with filters, search & grid
 │   ├── library.tsx              # Component Library showcase screen
 │   └── welcome.tsx              # Welcome screen
 ├── components/
@@ -121,16 +151,28 @@ src/
 │   ├── layout/
 │   │   ├── Footer.tsx           # Scrollable footer with library link
 │   │   └── Header.tsx           # Fixed full-width app header
+│   │   └── SearchBar.tsx        # Live search bar with clear button
 │   └── products/
-│       └── ProductCard.tsx      # Composed ProductCard with dynamic total & alert
+│       ├── filters/
+│       │   ├── BrandFilter.tsx     # Brand checkboxes with "More/Less"
+│       │   ├── CategoryFilter.tsx  # Category checkboxes with "More/Less"
+│       │   ├── FilterSidebar.tsx   # Collapsible mobile filter accordion ("FILTERS +/−")
+│       │   ├── PriceFilter.tsx     # Price range checkboxes
+│       │   ├── RatingFilter.tsx    # Star rating threshold checkboxes
+│       │   └── SortFilter.tsx      # Radio group with expand/collapse sort directions
+│       ├── ProductCard.tsx      # Composed ProductCard with dynamic total & alert
+│       └── ProductCountBar.tsx  # Dynamic results count & active sort indicator
 ├── data/
-│   └── products.json            # Mock product catalogue (8 items)
+│   └── products.json            # Product catalogue with categoryId & brandId
+├── services/
+│   └── productService.ts        # Async service layer for fetching, filtering & sorting
 ├── theme/
 │   └── colors.ts                # Centralized color tokens migrated from Next.js CSS
 └── types/
     ├── button.ts                # Button types, sizes, variants & styles
     ├── card.ts                  # Card & CtaCard types, variants & styles
-    └── product.ts               # Product interface definition
+    ├── filter.ts                # Filter props, ranges, sort options & directions
+    └── product.ts               # Product, CategoryItem, BrandItem & query params
 ```
 
 ---
