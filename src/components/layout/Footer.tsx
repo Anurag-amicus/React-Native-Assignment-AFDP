@@ -1,5 +1,7 @@
-import { View, Text, StyleSheet } from "react-native";
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { colors } from "@/theme/colors";
 
 export default function Footer() {
   const insets = useSafeAreaInsets();
@@ -18,18 +20,18 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingTop: 20,
     borderTopWidth: 1,
-    borderTopColor: "#f0f0f0",
+    borderTopColor: colors.border,
     alignItems: "center",
     justifyContent: "center",
   },
   brand: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#333333",
+    color: colors.charcoal,
     marginBottom: 4,
   },
   copyright: {
     fontSize: 12,
-    color: "#888888",
+    color: colors.muted,
   },
 });
