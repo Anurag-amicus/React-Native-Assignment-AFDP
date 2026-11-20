@@ -80,6 +80,29 @@ Build reusable Button and Card components with multiple variants, sizes and disa
 
 ---
 
+### Assignment 4 — Quantity Selector & Dynamic Total
+
+**Problem Statement:**
+Build quantity selector with + and - buttons, dynamic total calculation and Add to Cart alert using useState.
+
+**Key Deliverables & Implementation:**
+
+1. **Centralized Theme Tokens ([`src/theme/colors.ts`](src/theme/colors.ts)):**
+   - Migrated CSS variables from Next.js `@theme` (`orange`, `charcoal`, `border`, `surface`, etc.) to a centralized TypeScript color system for unified mobile styling.
+
+2. **Pure QuantitySelector Component ([`src/components/common/QuantitySelector.tsx`](src/components/common/QuantitySelector.tsx)):**
+   - Clean stepper pill with decrease (`−`) and increase (`+`) buttons and numeric quantity display.
+   - Disabled button states when reaching `min` (default 1) or `max` (default 50).
+   - Fully controlled component via `quantity` and `onChange(newQuantity)`.
+
+3. **Dynamic Total & Alert Integration in ProductCard ([`src/components/products/ProductCard.tsx`](src/components/products/ProductCard.tsx)):**
+   - Stateful local quantity managed via `useState(1)`.
+   - Real-time dynamic total calculation: `totalPrice = price * quantity`.
+   - Styled to match the Next.js product card with orange uppercase title, rating stars, unit price, quantity stepper, dynamic total, and "ADD TO CART" button.
+   - Native `Alert.alert` dialog triggered on Add to Cart showing item count, product name, and formatted total price.
+
+---
+
 ## 📁 Project Structure
 
 ```text
@@ -87,18 +110,23 @@ src/
 ├── app/
 │   ├── _layout.tsx              # Root Stack navigation layout
 │   ├── index.tsx                # Assignment 2: Product grid screen with fixed header
-│   └── welcome.tsx              # Assignment 1: Welcome screen
+│   ├── library.tsx              # Component Library showcase screen
+│   └── welcome.tsx              # Welcome screen
 ├── components/
 │   ├── common/
 │   │   ├── Button.tsx           # Reusable Button component (variants, sizes, disabled)
-│   │   └── Card.tsx             # Reusable Card container (variants)
+│   │   ├── Card.tsx             # Reusable Card container (variants)
+│   │   ├── CtaCard.tsx          # Composed CTA Card component
+│   │   └── QuantitySelector.tsx # Reusable stepper pill with min/max disabled bounds
 │   ├── layout/
 │   │   ├── Footer.tsx           # Scrollable footer with library link
 │   │   └── Header.tsx           # Fixed full-width app header
 │   └── products/
-│       └── ProductCard.tsx      # Composed ProductCard component
+│       └── ProductCard.tsx      # Composed ProductCard with dynamic total & alert
 ├── data/
 │   └── products.json            # Mock product catalogue (8 items)
+├── theme/
+│   └── colors.ts                # Centralized color tokens migrated from Next.js CSS
 └── types/
     ├── button.ts                # Button types, sizes, variants & styles
     ├── card.ts                  # Card & CtaCard types, variants & styles
