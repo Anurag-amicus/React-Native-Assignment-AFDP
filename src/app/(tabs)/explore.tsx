@@ -3,7 +3,8 @@ import { FlatList, StyleSheet, Text, View } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import SearchBar from "@/components/layout/SearchBar";
 import { ProductCard } from "@/components/products/ProductCard";
-import FilterSidebar from "@/components/products/filters/FilterSidebar";
+import FilterChipBar from "@/components/products/filters/FilterChipBar";
+import FilterBottomSheet from "@/components/products/filters/FilterBottomSheet";
 import ProductCountBar from "@/components/products/ProductCountBar";
 import { productService } from "@/services/productService";
 import type { BrandItem, CategoryItem, Product } from "@/types/product";
@@ -80,19 +81,26 @@ export default function ExploreScreen() {
     setSelectedDirection(null);
   };
 
+  const handleResetAllFilters = () => {
+    setSelectedCategoryId(null);
+    setSelectedBrandId(null);
+    setSelectedPriceRange(null);
+    setSelectedRating(null);
+    setSelectedSort(null);
+    setSelectedDirection(null);
+  };
+
   const renderHeader = () => (
     <View style={styles.headerControls}>
-      {/* 1. Live Search Bar */}
+      {/* 1. Live Search Bar (Floating Bubble Pill) */}
       <SearchBar
         value={searchQuery}
         onChangeText={setSearchQuery}
-        placeholder="Search products..."
+        placeholder="Search products, brands, categories..."
       />
 
-      {/* 2. Collapsible Filter Accordion */}
-      <FilterSidebar
-        isOpen={filtersOpen}
-        onToggle={() => setFiltersOpen((prev) => !prev)}
+      {/* 2. Horizontal Filter Chips Bar */}
+      <FilterChipBar
         categories={categories}
         brands={brands}
         selectedCategoryId={selectedCategoryId}
@@ -100,17 +108,8 @@ export default function ExploreScreen() {
         selectedPriceRange={selectedPriceRange}
         selectedRating={selectedRating}
         selectedSort={selectedSort}
-        selectedDirection={selectedDirection}
-        onCategoryChange={setSelectedCategoryId}
-        onBrandChange={setSelectedBrandId}
-        onPriceChange={setSelectedPriceRange}
-        onRatingChange={setSelectedRating}
-        onSortChange={(sort) => {
-          setSelectedSort(sort);
-          if (!selectedDirection) setSelectedDirection("asc");
-        }}
-        onDirectionChange={setSelectedDirection}
-        onClearSort={handleClearSort}
+        onOpenFilter={() => setFiltersOpen(true)}
+        onClearAll={handleResetAllFilters}
       />
 
       {/* 3. Dynamic Results Count & Sorting Status Bar */}
@@ -152,6 +151,31 @@ export default function ExploreScreen() {
             <ProductCard {...item} />
           </View>
         )}
+      />
+
+      {/* Native Bottom Sheet Filter Modal */}
+      <FilterBottomSheet
+        visible={filtersOpen}
+        onClose={() => setFiltersOpen(false)}
+        categories={categories}
+        brands={brands}
+        selectedCategoryId={selectedCategoryId}
+        selectedBrandId={selectedBrandId}
+        selectedPriceRange={selectedPriceRange}
+        selectedRating={selectedRating}
+        selectedSort={selectedSort}
+        selectedDirection={selectedDirection}
+        onCategoryChange={setSelectedCategoryId}
+        onBrandChange={setSelectedBrandId}
+        onPriceChange={setSelectedPriceRange}
+        onRatingChange={setSelectedRating}
+        onSortChange={(sort) => {
+          setSelectedSort(sort);
+          if (!selectedDirection) setSelectedDirection("asc");
+        }}
+        onDirectionChange={setSelectedDirection}
+        onClearSort={handleClearSort}
+        onResetAll={handleResetAllFilters}
       />
     </View>
   );
