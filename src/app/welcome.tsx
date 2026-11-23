@@ -1,5 +1,7 @@
+import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
+import { colors } from "@/theme/colors";
 
 export default function WelcomeScreen() {
   const handleGetStarted = () => {
@@ -25,7 +27,7 @@ export default function WelcomeScreen() {
 
       <Pressable
         style={styles.browseButton}
-        onPress={() => router.push("/")}
+        onPress={() => router.push("/products")}
         accessibilityRole="button"
       >
         <Text style={styles.browseButtonText}>Browse Products</Text>
@@ -40,51 +42,51 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 24,
-    backgroundColor: "#ffffff",
+    backgroundColor: colors.white,
   },
-
   title: {
-    fontSize: 30,
-    fontWeight: "bold",
+    fontSize: 28,
+    fontWeight: "800",
     textAlign: "center",
-    color: "#111111",
+    color: colors.charcoal,
     marginBottom: 12,
   },
-
   description: {
-    fontSize: 16,
-    color: "#666666",
+    fontSize: 15,
+    color: colors.muted,
     textAlign: "center",
     marginBottom: 28,
+    lineHeight: 22,
   },
-
   button: {
-    backgroundColor: "#ff5405",
+    backgroundColor: colors.orange,
     paddingVertical: 14,
     paddingHorizontal: 32,
     borderRadius: 8,
+    width: "100%",
+    maxWidth: 280,
+    alignItems: "center",
   },
-
   buttonText: {
-    color: "#ffffff",
+    color: colors.white,
     fontSize: 16,
     fontWeight: "bold",
   },
-
   browseButton: {
     marginTop: 12,
     paddingVertical: 14,
     paddingHorizontal: 32,
     borderRadius: 8,
     borderWidth: 1.5,
-    borderColor: "#1087FD",
+    borderColor: colors.orange,
     backgroundColor: "transparent",
+    width: "100%",
+    maxWidth: 280,
+    alignItems: "center",
   },
-
   browseButtonText: {
-    color: "#1087FD",
+    color: colors.orange,
     fontSize: 16,
     fontWeight: "bold",
   },
 });
-
