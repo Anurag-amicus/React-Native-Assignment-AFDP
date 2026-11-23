@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { useLocalSearchParams } from "expo-router";
-import Footer from "@/components/layout/Footer";
 import SearchBar from "@/components/layout/SearchBar";
 import { ProductCard } from "@/components/products/ProductCard";
 import FilterSidebar from "@/components/products/filters/FilterSidebar";
@@ -11,7 +10,7 @@ import type { BrandItem, CategoryItem, Product } from "@/types/product";
 import type { PriceRange, SortDirection, SortOption } from "@/types/filter";
 import { colors } from "@/theme/colors";
 
-export default function ProductsScreen() {
+export default function ExploreScreen() {
   const params = useLocalSearchParams<{ categoryId?: string; search?: string }>();
 
   const [categories, setCategories] = useState<CategoryItem[]>([]);
@@ -132,12 +131,6 @@ export default function ProductsScreen() {
     </View>
   );
 
-  const renderFooter = () => (
-    <View style={styles.footerWrapper}>
-      <Footer />
-    </View>
-  );
-
   return (
     <View style={styles.container}>
       {/* 2-Column Virtualized Product Grid */}
@@ -152,7 +145,6 @@ export default function ProductsScreen() {
         contentContainerStyle={styles.listContainer}
         ListHeaderComponent={renderHeader()}
         ListEmptyComponent={renderEmpty}
-        ListFooterComponent={renderFooter}
         renderItem={({ item }) => (
           <View style={styles.cardWrapper}>
             <ProductCard {...item} />
@@ -171,10 +163,7 @@ const styles = StyleSheet.create({
   listContainer: {
     paddingHorizontal: 16,
     paddingTop: 12,
-    paddingBottom: 0,
-  },
-  footerWrapper: {
-    marginHorizontal: -16,
+    paddingBottom: 24,
   },
   headerControls: {
     width: "100%",
@@ -211,3 +200,4 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
+

@@ -27,7 +27,7 @@ export default function WelcomeScreen() {
 
       <Pressable
         style={styles.browseButton}
-        onPress={() => router.push("/products")}
+        onPress={() => router.push("/explore")}
         accessibilityRole="button"
       >
         <Text style={styles.browseButtonText}>Browse Products</Text>

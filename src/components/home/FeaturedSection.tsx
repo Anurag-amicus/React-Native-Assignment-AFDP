@@ -32,7 +32,7 @@ export default function FeaturedSection() {
         <Text style={styles.title}>Featured Products</Text>
 
         <Pressable
-          onPress={() => router.push("/products")}
+          onPress={() => router.push("/explore")}
           style={styles.viewAllButton}
           accessibilityRole="button"
           accessibilityLabel="View all products"

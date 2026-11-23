@@ -24,10 +24,12 @@ export interface SidebarDrawerProps {
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
 
+type RoutePath = "/" | "/explore" | "/cart" | "/profile";
+
 interface NavItemConfig {
   key: string;
   label: string;
-  href: "/" | "/products";
+  href: RoutePath;
   icon: IoniconsName;
   iconActive: IoniconsName;
   isActive: (pathname: string) => boolean;
@@ -43,13 +45,29 @@ const NAV_ITEMS: NavItemConfig[] = [
     isActive: (pathname) => pathname === "/" || pathname === "/welcome" || pathname === "/home",
   },
   {
-    key: "products",
-    label: "Products",
-    href: "/products",
+    key: "explore",
+    label: "Explore",
+    href: "/explore",
     icon: "grid-outline",
     iconActive: "grid",
     isActive: (pathname) =>
-      pathname === "/products" || pathname.startsWith("/products"),
+      pathname === "/explore" || pathname === "/products" || pathname.startsWith("/explore"),
+  },
+  {
+    key: "cart",
+    label: "Cart",
+    href: "/cart",
+    icon: "cart-outline",
+    iconActive: "cart",
+    isActive: (pathname) => pathname === "/cart",
+  },
+  {
+    key: "profile",
+    label: "Profile",
+    href: "/profile",
+    icon: "person-outline",
+    iconActive: "person",
+    isActive: (pathname) => pathname === "/profile",
   },
 ];
 
@@ -95,7 +113,7 @@ export default function SidebarDrawer({ isOpen, onClose }: SidebarDrawerProps) {
     }
   }, [isOpen, fadeAnim, slideAnim]);
 
-  const handleNavigate = (href: "/" | "/products", active: boolean) => {
+  const handleNavigate = (href: RoutePath, active: boolean) => {
     onClose();
     if (!active) {
       router.push(href);

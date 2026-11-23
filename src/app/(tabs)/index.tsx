@@ -3,7 +3,6 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import HeroSection from "@/components/home/HeroSection";
 import FeaturedSection from "@/components/home/FeaturedSection";
 import CategorySection from "@/components/home/CategorySection";
-import Footer from "@/components/layout/Footer";
 import { colors } from "@/theme/colors";
 
 export default function HomeScreen() {
@@ -24,9 +23,6 @@ export default function HomeScreen() {
 
         {/* 3. Shop by Category Grid */}
         <CategorySection />
-
-        {/* 4. App Footer */}
-        <Footer />
       </ScrollView>
     </View>
   );
@@ -39,5 +35,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
+    paddingBottom: 24,
   },
 });
+

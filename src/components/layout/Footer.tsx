@@ -27,7 +27,7 @@ export default function Footer() {
         <Text style={styles.divider}>•</Text>
 
         <Pressable
-          onPress={() => router.push("/products")}
+          onPress={() => router.push("/explore")}
           style={styles.navButton}
           accessibilityRole="button"
           accessibilityLabel="Go to Products"

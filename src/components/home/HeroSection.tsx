@@ -20,11 +20,11 @@ export default function HeroSection() {
     const trimmed = searchQuery.trim();
     if (trimmed) {
       router.push({
-        pathname: "/products",
+        pathname: "/explore",
         params: { search: trimmed },
       });
     } else {
-      router.push("/products");
+      router.push("/explore");
     }
   };
 
@@ -104,7 +104,7 @@ export default function HeroSection() {
           {/* Primary CTA Button */}
           <Pressable
             style={styles.ctaButton}
-            onPress={() => router.push("/products")}
+            onPress={() => router.push("/explore")}
             accessibilityRole="button"
             accessibilityLabel="Shop Now"
           >

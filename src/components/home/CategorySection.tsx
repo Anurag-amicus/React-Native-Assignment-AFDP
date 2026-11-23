@@ -17,7 +17,7 @@ export default function CategorySection() {
 
   const handleCategoryPress = (categoryId: number) => {
     router.push({
-      pathname: "/products",
+      pathname: "/explore",
       params: { categoryId: categoryId.toString() },
     });
   };
