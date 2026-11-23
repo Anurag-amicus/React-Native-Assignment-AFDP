@@ -16,7 +16,7 @@ export default function CartScreen() {
 
         <Text style={styles.title}>Your Cart is Empty</Text>
         <Text style={styles.subtitle}>
-          Looks like you haven't added anything to your cart yet. Explore our products and find great deals!
+          Looks like you haven&apos;t added anything to your cart yet. Explore our products and find great deals!
         </Text>
 
         <Pressable

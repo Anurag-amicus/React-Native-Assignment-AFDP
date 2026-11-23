@@ -16,7 +16,7 @@ export default function Footer() {
       {/* Simple Footer Navigation Links (Without active highlight) */}
       <View style={styles.navRow}>
         <Pressable
-          onPress={() => router.push("/")}
+          onPress={() => router.push("/index")}
           style={styles.navButton}
           accessibilityRole="button"
           accessibilityLabel="Go to Home"

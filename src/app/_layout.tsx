@@ -1,13 +1,13 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { Stack } from "expo-router";
-import Header from "@/components/layout/Header";
+import TopAppBar from "@/components/layout/TopAppBar";
 import { colors } from "@/theme/colors";
 
 export default function RootLayout() {
   return (
     <View style={styles.container}>
-      <Header />
+      <TopAppBar />
       <View style={styles.content}>
         <Stack
           screenOptions={{

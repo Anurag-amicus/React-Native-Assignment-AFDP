@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -24,7 +24,7 @@ export interface SidebarDrawerProps {
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
 
-type RoutePath = "/" | "/explore" | "/cart" | "/profile";
+type RoutePath = "/index" | "/explore" | "/cart" | "/profile";
 
 interface NavItemConfig {
   key: string;
@@ -39,10 +39,10 @@ const NAV_ITEMS: NavItemConfig[] = [
   {
     key: "home",
     label: "Home",
-    href: "/",
+    href: "/index",
     icon: "home-outline",
     iconActive: "home",
-    isActive: (pathname) => pathname === "/" || pathname === "/welcome" || pathname === "/home",
+    isActive: (pathname) => pathname === "/" || pathname === "/index" || pathname === "/welcome" || pathname === "/home",
   },
   {
     key: "explore",
@@ -77,12 +77,14 @@ export default function SidebarDrawer({ isOpen, onClose }: SidebarDrawerProps) {
   const router = useRouter();
 
   const [visible, setVisible] = useState(isOpen);
-  const slideAnim = useRef(new Animated.Value(-DRAWER_WIDTH)).current;
-  const fadeAnim = useRef(new Animated.Value(0)).current;
+  if (isOpen && !visible) {
+    setVisible(true);
+  }
+  const [slideAnim] = useState(() => new Animated.Value(-DRAWER_WIDTH));
+  const [fadeAnim] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
     if (isOpen) {
-      setVisible(true);
       Animated.parallel([
         Animated.timing(slideAnim, {
           toValue: 0,

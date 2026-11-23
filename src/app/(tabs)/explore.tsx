@@ -24,21 +24,23 @@ export default function ExploreScreen() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
     params.categoryId ? Number(params.categoryId) : null
   );
+  const [prevCategoryParam, setPrevCategoryParam] = useState(params.categoryId);
+  const [prevSearchParam, setPrevSearchParam] = useState(params.search);
+
+  if (params.categoryId !== prevCategoryParam) {
+    setPrevCategoryParam(params.categoryId);
+    setSelectedCategoryId(params.categoryId ? Number(params.categoryId) : null);
+  }
+  if (params.search !== prevSearchParam) {
+    setPrevSearchParam(params.search);
+    setSearchQuery(params.search ?? "");
+  }
+
   const [selectedBrandId, setSelectedBrandId] = useState<number | null>(null);
   const [selectedPriceRange, setSelectedPriceRange] = useState<PriceRange | null>(null);
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
   const [selectedSort, setSelectedSort] = useState<SortOption | null>(null);
   const [selectedDirection, setSelectedDirection] = useState<SortDirection>("asc");
-
-  // Sync params when navigated with new params
-  useEffect(() => {
-    if (params.categoryId) {
-      setSelectedCategoryId(Number(params.categoryId));
-    }
-    if (params.search !== undefined) {
-      setSearchQuery(params.search);
-    }
-  }, [params.categoryId, params.search]);
 
   // Load Categories & Brands on mount
   useEffect(() => {

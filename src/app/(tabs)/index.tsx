@@ -15,14 +15,14 @@ export default function HomeScreen() {
         contentInsetAdjustmentBehavior="never"
         contentContainerStyle={styles.scrollContent}
       >
-        {/* 1. Hero Promo Section with Search & CTA */}
+        {/* 1. Hero Promo Card */}
         <HeroSection />
 
-        {/* 2. Featured Products Horizontal Scroll Section */}
-        <FeaturedSection />
-
-        {/* 3. Shop by Category Grid */}
+        {/* 2. Shop by Category Visual Cards */}
         <CategorySection />
+
+        {/* 3. Featured Products Horizontal Strip */}
+        <FeaturedSection />
       </ScrollView>
     </View>
   );

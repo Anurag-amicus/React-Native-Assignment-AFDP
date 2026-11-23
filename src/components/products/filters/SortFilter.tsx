@@ -1,6 +1,6 @@
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import type { SortDirection, SortFilterProps, SortOption } from "@/types/filter";
+import type { SortFilterProps, SortOption } from "@/types/filter";
 import { colors } from "@/theme/colors";
 
 export default function SortFilter({

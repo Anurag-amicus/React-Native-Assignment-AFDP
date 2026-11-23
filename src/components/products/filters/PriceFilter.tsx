@@ -1,6 +1,6 @@
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import type { PriceFilterProps, PriceRange } from "@/types/filter";
+import type { PriceFilterProps } from "@/types/filter";
 import { colors } from "@/theme/colors";
 import { Ionicons } from "@react-native-vector-icons/ionicons";
 

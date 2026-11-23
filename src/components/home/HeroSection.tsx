@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Image,
   Pressable,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from "react-native";
 import { useRouter } from "expo-router";
@@ -13,102 +12,65 @@ import { Ionicons } from "@react-native-vector-icons/ionicons";
 import { colors } from "@/theme/colors";
 
 export default function HeroSection() {
-  const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
 
-  const handleSearchSubmit = () => {
-    const trimmed = searchQuery.trim();
-    if (trimmed) {
-      router.push({
-        pathname: "/explore",
-        params: { search: trimmed },
-      });
-    } else {
-      router.push("/explore");
-    }
+  const handleExplore = () => {
+    router.push("/explore");
   };
 
   return (
     <View style={styles.container}>
-      {/* Top Overscroll Extension to seamlessly fill any pull-down bounce */}
-      <View style={styles.topOverscrollExtension} />
-
-      <View style={styles.heroWrapper}>
-        {/* Hero Background Image */}
+      <View style={styles.card}>
+        {/* High-Resolution Hero Photography */}
         <Image
           source={require("../../../assets/herosection.png")}
-          style={styles.backgroundImage}
+          style={styles.heroImage}
           resizeMode="cover"
         />
 
-        {/* Multi-Stop Horizontal Gradient Overlay (Matching Next.js bg-linear-to-r) */}
+        {/* Sophisticated Dark-to-Translucent Gradient Scrim for Readability */}
         <LinearGradient
           colors={[
-            "rgba(255, 248, 238, 0.95)",
-            "rgba(255, 248, 238, 0.72)",
-            "rgba(255, 248, 238, 0.16)",
+            "rgba(15, 23, 42, 0.88)",
+            "rgba(15, 23, 42, 0.55)",
+            "rgba(15, 23, 42, 0.15)",
           ]}
-          locations={[0, 0.54, 1]}
+          locations={[0, 0.52, 1]}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
           style={styles.gradientOverlay}
         />
 
-        {/* Hero Content */}
+        {/* Hero Card Content */}
         <View style={styles.content}>
-          {/* Tagline */}
-          <Text style={styles.tagline}>ONLINE EXPRESS</Text>
+          {/* Curated Collection Eyebrow */}
+          <View style={styles.eyebrowBadge}>
+            <Ionicons name="sparkles" size={11} color={colors.orange} />
+            <Text style={styles.eyebrowText}>CURATED FOR YOU</Text>
+          </View>
 
           {/* Main Headline */}
-          <Text style={styles.headline}>FIND THE RIGHT PRODUCTS</Text>
+          <Text style={styles.headline}>
+            Find The Right Products
+          </Text>
 
           {/* Subtitle */}
           <Text style={styles.subtitle}>
-            Discover quality products designed to fit your everyday needs.
+            Discover quality essentials crafted for everyday style, performance, and durability.
           </Text>
 
-          {/* Hero Search Bar */}
-          <View style={styles.searchBar}>
-            <TextInput
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              placeholder="Search products..."
-              placeholderTextColor={colors.muted}
-              returnKeyType="search"
-              onSubmitEditing={handleSearchSubmit}
-              style={styles.searchInput}
-            />
-
-            {searchQuery.length > 0 && (
-              <Pressable
-                onPress={() => setSearchQuery("")}
-                hitSlop={8}
-                style={styles.clearButton}
-                accessibilityRole="button"
-                accessibilityLabel="Clear search input"
-              >
-                <Text style={styles.clearButtonText}>×</Text>
-              </Pressable>
-            )}
-
-            <Pressable
-              onPress={handleSearchSubmit}
-              style={styles.searchIconButton}
-              accessibilityRole="button"
-              accessibilityLabel="Search"
-            >
-              <Ionicons name="search" size={18} color={colors.orange} />
-            </Pressable>
-          </View>
-
-          {/* Primary CTA Button */}
+          {/* Modern Primary Action Button */}
           <Pressable
-            style={styles.ctaButton}
-            onPress={() => router.push("/explore")}
+            onPress={handleExplore}
+            style={({ pressed }) => [
+              styles.ctaButton,
+              pressed && styles.ctaButtonPressed,
+            ]}
             accessibilityRole="button"
-            accessibilityLabel="Shop Now"
+            accessibilityLabel="Explore our product collection"
           >
-            <Text style={styles.ctaButtonText}>SHOP NOW</Text>
+            <Text style={styles.ctaText}>EXPLORE COLLECTION</Text>
+            <Ionicons name="arrow-forward" size={16} color={colors.white} />
           </Pressable>
         </View>
       </View>
@@ -119,125 +81,99 @@ export default function HeroSection() {
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    backgroundColor: "#fff8ee",
-    position: "relative",
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 6,
+    backgroundColor: colors.white,
   },
-  topOverscrollExtension: {
-    position: "absolute",
-    top: -600,
-    left: 0,
-    right: 0,
-    height: 600,
-    backgroundColor: "#fff8ee",
-  },
-  heroWrapper: {
+  card: {
     width: "100%",
-    minHeight: 330,
-    position: "relative",
+    height: 220,
+    borderRadius: 20,
     overflow: "hidden",
-    justifyContent: "center",
+    position: "relative",
+    backgroundColor: "#1e293b",
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
   },
-  backgroundImage: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+  heroImage: {
+    ...StyleSheet.absoluteFill,
     width: "100%",
     height: "100%",
   },
   gradientOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    ...StyleSheet.absoluteFill,
+    width: "100%",
+    height: "100%",
   },
   content: {
+    flex: 1,
+    justifyContent: "center",
     paddingHorizontal: 20,
-    paddingVertical: 28,
-    width: "100%",
-    maxWidth: 320,
+    paddingVertical: 18,
+    maxWidth: "80%",
+    zIndex: 2,
   },
-  tagline: {
-    fontSize: 12,
-    fontWeight: "800",
-    letterSpacing: 2,
-    color: colors.orange,
-    textTransform: "uppercase",
-    marginBottom: 6,
-  },
-  headline: {
-    fontSize: 27,
-    fontWeight: "900",
-    color: colors.black,
-    letterSpacing: -0.5,
-    lineHeight: 33,
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 13.5,
-    color: colors.charcoal,
-    lineHeight: 19,
-    marginBottom: 18,
-  },
-  searchBar: {
-    width: "100%",
-    height: 42,
+  eyebrowBadge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.white,
+    alignSelf: "flex-start",
+    backgroundColor: "rgba(255, 84, 5, 0.18)",
     borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 6,
-    marginBottom: 16,
-    overflow: "hidden",
-  },
-  searchInput: {
-    flex: 1,
-    height: "100%",
-    paddingHorizontal: 12,
-    fontSize: 13.5,
-    color: colors.charcoal,
-  },
-  clearButton: {
+    borderColor: "rgba(255, 84, 5, 0.4)",
     paddingHorizontal: 8,
-    height: "100%",
-    justifyContent: "center",
-    alignItems: "center",
+    paddingVertical: 3,
+    borderRadius: 12,
+    gap: 4,
+    marginBottom: 8,
   },
-  clearButtonText: {
-    fontSize: 18,
-    color: colors.muted,
-    lineHeight: 18,
+  eyebrowText: {
+    fontSize: 9,
+    fontWeight: "800",
+    color: colors.orange,
+    letterSpacing: 1.2,
   },
-  searchIconButton: {
-    width: 42,
-    height: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-    borderLeftWidth: 1,
-    borderLeftColor: colors.border,
+  headline: {
+    fontSize: 22,
+    fontWeight: "900",
+    color: colors.white,
+    letterSpacing: -0.4,
+    lineHeight: 27,
+    marginBottom: 6,
+  },
+  subtitle: {
+    fontSize: 11.5,
+    fontWeight: "500",
+    color: "#cbd5e1",
+    lineHeight: 16,
+    marginBottom: 16,
   },
   ctaButton: {
-    backgroundColor: colors.orange,
-    paddingVertical: 12,
-    paddingHorizontal: 26,
-    borderRadius: 6,
-    alignSelf: "flex-start",
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    elevation: 3,
-    shadowColor: "#000",
+    alignSelf: "flex-start",
+    backgroundColor: colors.orange,
+    paddingVertical: 9,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    gap: 6,
+    elevation: 2,
+    shadowColor: colors.orange,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.3,
     shadowRadius: 4,
   },
-  ctaButtonText: {
-    color: colors.white,
-    fontSize: 13.5,
+  ctaButtonPressed: {
+    opacity: 0.88,
+    transform: [{ scale: 0.98 }],
+  },
+  ctaText: {
+    fontSize: 11,
     fontWeight: "800",
-    letterSpacing: 1,
-    textTransform: "uppercase",
+    color: colors.white,
+    letterSpacing: 0.8,
   },
 });

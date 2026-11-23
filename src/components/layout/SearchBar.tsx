@@ -23,10 +23,17 @@ export default function SearchBar({
 }: SearchBarProps) {
   return (
     <View style={styles.container}>
+      <Ionicons
+        name="search"
+        size={18}
+        color={colors.orange}
+        style={styles.searchIcon}
+      />
+
       <TextInput
         style={styles.input}
         placeholder={placeholder}
-        placeholderTextColor={colors.subtle}
+        placeholderTextColor={colors.muted}
         value={value}
         onChangeText={onChangeText}
         returnKeyType="search"
@@ -34,7 +41,7 @@ export default function SearchBar({
         autoCorrect={false}
       />
 
-      {value.length > 0 ? (
+      {value.length > 0 && (
         <Pressable
           onPress={() => {
             onChangeText("");
@@ -44,12 +51,8 @@ export default function SearchBar({
           hitSlop={8}
           accessibilityLabel="Clear search"
         >
-          <Ionicons name="close-circle" size={16} color={colors.muted} />
+          <Ionicons name="close-circle" size={18} color={colors.muted} />
         </Pressable>
-      ) : (
-        <View style={styles.iconButton}>
-          <Ionicons name="search" size={16} color={colors.orange} />
-        </View>
       )}
     </View>
   );
@@ -58,15 +61,18 @@ export default function SearchBar({
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    height: 38,
+    height: 42,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.white,
+    backgroundColor: "#f4f5f7",
     borderWidth: 1,
-    borderColor: colors.borderDark,
-    borderRadius: 4,
-    paddingHorizontal: 10,
+    borderColor: "#e5e7eb",
+    borderRadius: 22,
+    paddingHorizontal: 12,
     marginBottom: 10,
+  },
+  searchIcon: {
+    marginRight: 8,
   },
   input: {
     flex: 1,
