@@ -133,13 +133,47 @@ Create FlatList-based product listing with category filters and product count.
 
 ---
 
+### Assignment 6 — Static Home Screen & Modern Native Architecture
+
+**Problem Statement:**
+Build Home Screen with header, hero banner, categories, featured products and footer navigation.
+
+**Key Deliverables & Implementation:**
+
+1. **Native Bottom Tab Navigation ([`src/app/(tabs)/_layout.tsx`](src/app/(tabs)/_layout.tsx)):**
+   - 4-tab thumb navigation (`Home`, `Explore`, `Cart`, `Profile`) with active brand tint, replacing the desktop website footer.
+
+2. **Top App Bar & Floating Search Pill ([`src/components/layout/TopAppBar.tsx`](src/components/layout/TopAppBar.tsx)):**
+   - Safe area status bar, brand logo on left, cart with live badge on right, and an integrated floating bubble search pill.
+
+3. **Curated Hero Promo Card ([`src/components/home/HeroSection.tsx`](src/components/home/HeroSection.tsx)):**
+   - Rounded promo card (`borderRadius: 20`) with high-res photography, dark scrim gradient, and "Explore Collection" CTA (no discount badges).
+
+4. **Visual Category Cards ([`src/components/home/CategorySection.tsx`](src/components/home/CategorySection.tsx)):**
+   - Horizontal scrolling cards with rounded borders (`borderRadius: 16`), distinct category icons, and high-res background imagery.
+
+5. **Featured Products Strip ([`src/components/home/FeaturedSection.tsx`](src/components/home/FeaturedSection.tsx)):**
+   - Horizontal scroll strip showcasing featured products using the modernized `ProductCard`.
+
+6. **Native Enhancements Across App:**
+   - **Cleaner Product Card Anatomy ([`src/components/products/ProductCard.tsx`](src/components/products/ProductCard.tsx)):** Soft elevation, floating rating badge, and streamlined Add to Cart pill.
+   - **Filter Chips & Bottom Sheet ([`src/components/products/filters/FilterBottomSheet.tsx`](src/components/products/filters/FilterBottomSheet.tsx)):** Sticky quick-filter chips and native slide-up modal.
+   - **Dedicated Cart & Profile ([`src/app/(tabs)/cart.tsx`](src/app/(tabs)/cart.tsx), [`src/app/(tabs)/profile.tsx`](src/app/(tabs)/profile.tsx)):** Interactive checkout and native account menu.
+
+---
+
 ## 📁 Project Structure
 
 ```text
 src/
 ├── app/
-│   ├── _layout.tsx              # Root Stack navigation layout
-│   ├── index.tsx                # Product listing screen with filters, search & grid
+│   ├── _layout.tsx              # Root Stack navigation layout with TopAppBar
+│   ├── (tabs)/                  # Native bottom tab navigator
+│   │   ├── _layout.tsx          # 4-tab bar (Home, Explore, Cart, Profile)
+│   │   ├── index.tsx            # Home screen (Hero, Categories, Featured)
+│   │   ├── explore.tsx          # Product catalog with search, filter chips & grid
+│   │   ├── cart.tsx             # Dedicated cart screen with steppers & checkout
+│   │   └── profile.tsx          # Dedicated profile screen with account settings
 │   ├── library.tsx              # Component Library showcase screen
 │   └── welcome.tsx              # Welcome screen
 ├── components/
@@ -148,26 +182,30 @@ src/
 │   │   ├── Card.tsx             # Reusable Card container (variants)
 │   │   ├── CtaCard.tsx          # Composed CTA Card component
 │   │   └── QuantitySelector.tsx # Reusable stepper pill with min/max disabled bounds
+│   ├── home/
+│   │   ├── CategorySection.tsx  # Visual category cards horizontal scroll
+│   │   ├── FeaturedSection.tsx  # Featured products horizontal strip
+│   │   └── HeroSection.tsx      # Curated Hero promo card (no discount badges)
 │   ├── layout/
-│   │   ├── Footer.tsx           # Scrollable footer with library link
-│   │   └── Header.tsx           # Fixed full-width app header
-│   │   └── SearchBar.tsx        # Live search bar with clear button
+│   │   ├── SearchBar.tsx        # Floating bubble search pill
+│   │   └── TopAppBar.tsx        # Brand logo, cart badge & floating search bar
 │   └── products/
 │       ├── filters/
-│       │   ├── BrandFilter.tsx     # Brand checkboxes with "More/Less"
-│       │   ├── CategoryFilter.tsx  # Category checkboxes with "More/Less"
-│       │   ├── FilterSidebar.tsx   # Collapsible mobile filter accordion ("FILTERS +/−")
-│       │   ├── PriceFilter.tsx     # Price range checkboxes
-│       │   ├── RatingFilter.tsx    # Star rating threshold checkboxes
-│       │   └── SortFilter.tsx      # Radio group with expand/collapse sort directions
-│       ├── ProductCard.tsx      # Composed ProductCard with dynamic total & alert
-│       └── ProductCountBar.tsx  # Dynamic results count & active sort indicator
+│       │   ├── BrandFilter.tsx       # Brand checkboxes with "More/Less"
+│       │   ├── CategoryFilter.tsx    # Category checkboxes with "More/Less"
+│       │   ├── FilterBottomSheet.tsx # Native slide-up filter sheet modal
+│       │   ├── FilterChipBar.tsx     # Horizontal quick-filter chips bar
+│       │   ├── PriceFilter.tsx       # Price range checkboxes
+│       │   ├── RatingFilter.tsx      # Star rating threshold checkboxes
+│       │   └── SortFilter.tsx        # Radio group with expand/collapse sort directions
+│       ├── ProductCard.tsx        # Modern ProductCard with floating rating & add pill
+│       └── ProductCountBar.tsx    # Dynamic results count & active sort indicator
 ├── data/
 │   └── products.json            # Product catalogue with categoryId & brandId
 ├── services/
 │   └── productService.ts        # Async service layer for fetching, filtering & sorting
 ├── theme/
-│   └── colors.ts                # Centralized color tokens migrated from Next.js CSS
+│   └── colors.ts                # Centralized color tokens
 └── types/
     ├── button.ts                # Button types, sizes, variants & styles
     ├── card.ts                  # Card & CtaCard types, variants & styles
