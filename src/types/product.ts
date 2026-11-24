@@ -23,24 +23,9 @@ export interface Product {
   description?: string;
 }
 
-export interface CategoryItem {
-  categoryId: number;
-  name: string;
-}
-
-export type CategoryResponse = CategoryItem[];
-
-export interface BrandItem {
-  brandId: number;
-  name: string;
-}
-
-export type BrandResponse = BrandItem[];
-
 export interface ProductQueryParams {
   search?: string;
-  categoryId?: number | null;
-  brandId?: number | null;
+  category?: string | null;
   minPrice?: number | null;
   maxPrice?: number | null;
   minRating?: number | null;

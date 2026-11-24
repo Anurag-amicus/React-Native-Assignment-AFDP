@@ -1,61 +1,60 @@
+import { apiRequest } from "./apiClient";
+import type { ApiResult } from "@/types/api";
 import type {
-  BrandItem,
-  CategoryItem,
   Product,
   ProductQueryParams,
+  ProductResponse,
 } from "@/types/product";
-import rawProducts from "../data/products.json";
 
-export const MOCK_CATEGORIES: CategoryItem[] = [
-  { categoryId: 1, name: "Electronics" },
-  { categoryId: 2, name: "Fashion" },
-  { categoryId: 3, name: "Home" },
-  { categoryId: 4, name: "Footwear" },
-  { categoryId: 5, name: "Accessories" },
-];
-
-export const MOCK_BRANDS: BrandItem[] = [
-  { brandId: 1, name: "Sony" },
-  { brandId: 2, name: "Apple" },
-  { brandId: 3, name: "Nike" },
-  { brandId: 4, name: "Puma" },
-  { brandId: 5, name: "Casio" },
-  { brandId: 6, name: "Logitech" },
-  { brandId: 7, name: "Ray-Ban" },
-  { brandId: 8, name: "Woodland" },
-];
-
-const PRODUCTS: Product[] = rawProducts;
+function transformProductResponse(item: ProductResponse): Product {
+  return {
+    id: item.id,
+    name: item.title,
+    category: item.category,
+    price: Math.round(item.price * 100),
+    rating: item.rating?.rate ?? 0,
+    imageUrl: item.image,
+    description: item.description,
+  };
+}
 
 class ProductService {
+  private readonly baseUrl = "https://fakestoreapi.com";
+
   /**
-   * GET /api/Categories
+   * GET /products/categories - Directly returns ApiResult<string[]>
    */
-  async getCategories(): Promise<CategoryItem[]> {
-    return Promise.resolve(MOCK_CATEGORIES);
+  async getCategories(options?: RequestInit): Promise<ApiResult<string[]>> {
+    return apiRequest<string[]>(`${this.baseUrl}/products/categories`, options);
   }
 
   /**
-   * GET /api/Brands
+   * GET /products with client-side searching, filtering, and sorting
+   * Returns ApiResult without throwing
    */
-  async getBrands(): Promise<BrandItem[]> {
-    return Promise.resolve(MOCK_BRANDS);
-  }
+  async getProducts(
+    params?: ProductQueryParams,
+    options?: RequestInit
+  ): Promise<ApiResult<{ products: Product[]; totalRecords: number }>> {
+    const res = await apiRequest<ProductResponse[]>(
+      `${this.baseUrl}/products`,
+      options
+    );
 
-  /**
-   * GET /api/v1/Products/search with search, filters, and sort
-   */
-  async getProducts(params?: ProductQueryParams): Promise<{
-    products: Product[];
-    totalRecords: number;
-  }> {
-    let list = [...PRODUCTS];
-
-    if (!params) {
-      return Promise.resolve({ products: list, totalRecords: list.length });
+    if (!res.success) {
+      return res;
     }
 
-    // 1. Search Query filter
+    let list = res.data.map(transformProductResponse);
+
+    if (!params) {
+      return {
+        success: true,
+        data: { products: list, totalRecords: list.length },
+      };
+    }
+
+    // 1. Search filter
     if (params.search && params.search.trim() !== "") {
       const q = params.search.trim().toLowerCase();
       list = list.filter(
@@ -65,7 +64,13 @@ class ProductService {
       );
     }
 
-    // 4. Price range filter
+    // 2. Category filter (direct string matching)
+    if (params.category && params.category.trim() !== "") {
+      const cat = params.category.trim().toLowerCase();
+      list = list.filter((p) => p.category.toLowerCase() === cat);
+    }
+
+    // 3. Price range filter
     if (params.minPrice !== null && params.minPrice !== undefined) {
       list = list.filter((p) => p.price >= params.minPrice!);
     }
@@ -73,12 +78,12 @@ class ProductService {
       list = list.filter((p) => p.price <= params.maxPrice!);
     }
 
-    // 5. Rating filter
+    // 4. Rating filter
     if (params.minRating !== null && params.minRating !== undefined) {
       list = list.filter((p) => p.rating >= params.minRating!);
     }
 
-    // 6. Sorting
+    // 5. Sorting
     if (params.sortBy) {
       const order = params.sortOrder === "desc" ? -1 : 1;
       list.sort((a, b) => {
@@ -95,10 +100,35 @@ class ProductService {
       });
     }
 
-    return Promise.resolve({
-      products: list,
-      totalRecords: list.length,
-    });
+    return {
+      success: true,
+      data: {
+        products: list,
+        totalRecords: list.length,
+      },
+    };
+  }
+
+  /**
+   * GET /products/:id - Returns ApiResult<Product>
+   */
+  async getProductById(
+    id: number | string,
+    options?: RequestInit
+  ): Promise<ApiResult<Product>> {
+    const res = await apiRequest<ProductResponse>(
+      `${this.baseUrl}/products/${id}`,
+      options
+    );
+
+    if (!res.success) {
+      return res;
+    }
+
+    return {
+      success: true,
+      data: transformProductResponse(res.data),
+    };
   }
 }
 

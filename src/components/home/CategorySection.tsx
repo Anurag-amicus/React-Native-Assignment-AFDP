@@ -11,7 +11,6 @@ import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@react-native-vector-icons/ionicons";
 import { productService } from "@/services/productService";
-import type { CategoryItem } from "@/types/product";
 import { colors } from "@/theme/colors";
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
@@ -22,36 +21,30 @@ interface CategoryMeta {
   subtitle: string;
 }
 
-const CATEGORY_META: Record<number, CategoryMeta> = {
-  1: {
+const CATEGORY_META_BY_NAME: Record<string, CategoryMeta> = {
+  electronics: {
     icon: "laptop-outline",
     imageUrl:
       "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80",
-    subtitle: "Audio & Gadgets",
+    subtitle: "Audio & Tech",
   },
-  2: {
+  jewelery: {
+    icon: "diamond-outline",
+    imageUrl:
+      "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=500&q=80",
+    subtitle: "Fine Jewels",
+  },
+  "men's clothing": {
     icon: "shirt-outline",
     imageUrl:
       "https://images.unsplash.com/photo-1445205170230-053b83016050?w=500&q=80",
-    subtitle: "Apparel & Trends",
+    subtitle: "Men's Apparel",
   },
-  3: {
-    icon: "home-outline",
+  "women's clothing": {
+    icon: "woman-outline",
     imageUrl:
-      "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=500&q=80",
-    subtitle: "Living & Decor",
-  },
-  4: {
-    icon: "footsteps-outline",
-    imageUrl:
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&q=80",
-    subtitle: "Kicks & Boots",
-  },
-  5: {
-    icon: "watch-outline",
-    imageUrl:
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80",
-    subtitle: "Watches & Bags",
+      "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=500&q=80",
+    subtitle: "Women's Fashion",
   },
 };
 
@@ -63,19 +56,23 @@ const DEFAULT_META: CategoryMeta = {
 };
 
 export default function CategorySection() {
-  const [categories, setCategories] = useState<CategoryItem[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const router = useRouter();
 
   useEffect(() => {
-    productService.getCategories().then(setCategories);
+    productService.getCategories().then((res) => {
+      if (res.success) {
+        setCategories(res.data);
+      }
+    });
   }, []);
 
   if (categories.length === 0) return null;
 
-  const handleCategoryPress = (categoryId: number) => {
+  const handleCategoryPress = (category: string) => {
     router.push({
       pathname: "/explore",
-      params: { categoryId: categoryId.toString() },
+      params: { category },
     });
   };
 
@@ -103,22 +100,23 @@ export default function CategorySection() {
       {/* Modern Visual Category Cards Horizontal Strip */}
       <FlatList
         data={categories}
-        keyExtractor={(item) => `cat-${item.categoryId}`}
+        keyExtractor={(item) => `cat-${item}`}
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.listContainer}
         renderItem={({ item }) => {
-          const meta = CATEGORY_META[item.categoryId] ?? DEFAULT_META;
+          const meta =
+            CATEGORY_META_BY_NAME[item.toLowerCase()] ?? DEFAULT_META;
 
           return (
             <Pressable
-              onPress={() => handleCategoryPress(item.categoryId)}
+              onPress={() => handleCategoryPress(item)}
               style={({ pressed }) => [
                 styles.categoryCard,
                 pressed && styles.categoryCardPressed,
               ]}
               accessibilityRole="button"
-              accessibilityLabel={`Shop ${item.name} category`}
+              accessibilityLabel={`Shop ${item} category`}
             >
               {/* Background Image */}
               <Image
@@ -146,7 +144,7 @@ export default function CategorySection() {
               {/* Bottom Title & Subtitle */}
               <View style={styles.textContainer}>
                 <Text style={styles.categoryName} numberOfLines={1}>
-                  {item.name}
+                  {item.charAt(0).toUpperCase() + item.slice(1)}
                 </Text>
                 <Text style={styles.categorySubtitle} numberOfLines={1}>
                   {meta.subtitle}

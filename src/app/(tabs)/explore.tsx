@@ -7,46 +7,47 @@ import FilterChipBar from "@/components/products/filters/FilterChipBar";
 import FilterBottomSheet from "@/components/products/filters/FilterBottomSheet";
 import ProductCountBar from "@/components/products/ProductCountBar";
 import { productService } from "@/services/productService";
-import type { BrandItem, CategoryItem, Product } from "@/types/product";
+import type { Product } from "@/types/product";
 import type { PriceRange, SortDirection, SortOption } from "@/types/filter";
 import { colors } from "@/theme/colors";
 
 export default function ExploreScreen() {
-  const params = useLocalSearchParams<{ categoryId?: string; search?: string }>();
+  const params = useLocalSearchParams<{ category?: string; search?: string }>();
 
-  const [categories, setCategories] = useState<CategoryItem[]>([]);
-  const [brands, setBrands] = useState<BrandItem[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [totalRecords, setTotalRecords] = useState(0);
 
   // Filter & Search states
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState(params.search ?? "");
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
-    params.categoryId ? Number(params.categoryId) : null
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(
+    params.category ?? null
   );
-  const [prevCategoryParam, setPrevCategoryParam] = useState(params.categoryId);
+  const [prevCategoryParam, setPrevCategoryParam] = useState(params.category);
   const [prevSearchParam, setPrevSearchParam] = useState(params.search);
 
-  if (params.categoryId !== prevCategoryParam) {
-    setPrevCategoryParam(params.categoryId);
-    setSelectedCategoryId(params.categoryId ? Number(params.categoryId) : null);
+  if (params.category !== prevCategoryParam) {
+    setPrevCategoryParam(params.category);
+    setSelectedCategory(params.category ?? null);
   }
   if (params.search !== prevSearchParam) {
     setPrevSearchParam(params.search);
     setSearchQuery(params.search ?? "");
   }
 
-  const [selectedBrandId, setSelectedBrandId] = useState<number | null>(null);
   const [selectedPriceRange, setSelectedPriceRange] = useState<PriceRange | null>(null);
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
   const [selectedSort, setSelectedSort] = useState<SortOption | null>(null);
   const [selectedDirection, setSelectedDirection] = useState<SortDirection>("asc");
 
-  // Load Categories & Brands on mount
+  // Load Categories directly from API on mount
   useEffect(() => {
-    productService.getCategories().then(setCategories);
-    productService.getBrands().then(setBrands);
+    productService.getCategories().then((res) => {
+      if (res.success) {
+        setCategories(res.data);
+      }
+    });
   }, []);
 
   // Fetch / Filter products whenever any query param changes
@@ -54,8 +55,7 @@ export default function ExploreScreen() {
     productService
       .getProducts({
         search: searchQuery,
-        categoryId: selectedCategoryId,
-        brandId: selectedBrandId,
+        category: selectedCategory,
         minPrice: selectedPriceRange?.min,
         maxPrice: selectedPriceRange?.max,
         minRating: selectedRating,
@@ -63,13 +63,14 @@ export default function ExploreScreen() {
         sortOrder: selectedDirection,
       })
       .then((res) => {
-        setProducts(res.products);
-        setTotalRecords(res.totalRecords);
+        if (res.success) {
+          setProducts(res.data.products);
+          setTotalRecords(res.data.totalRecords);
+        }
       });
   }, [
     searchQuery,
-    selectedCategoryId,
-    selectedBrandId,
+    selectedCategory,
     selectedPriceRange,
     selectedRating,
     selectedSort,
@@ -82,8 +83,7 @@ export default function ExploreScreen() {
   };
 
   const handleResetAllFilters = () => {
-    setSelectedCategoryId(null);
-    setSelectedBrandId(null);
+    setSelectedCategory(null);
     setSelectedPriceRange(null);
     setSelectedRating(null);
     setSelectedSort(null);
@@ -102,9 +102,7 @@ export default function ExploreScreen() {
       {/* 2. Horizontal Filter Chips Bar */}
       <FilterChipBar
         categories={categories}
-        brands={brands}
-        selectedCategoryId={selectedCategoryId}
-        selectedBrandId={selectedBrandId}
+        selectedCategory={selectedCategory}
         selectedPriceRange={selectedPriceRange}
         selectedRating={selectedRating}
         selectedSort={selectedSort}
@@ -158,15 +156,12 @@ export default function ExploreScreen() {
         visible={filtersOpen}
         onClose={() => setFiltersOpen(false)}
         categories={categories}
-        brands={brands}
-        selectedCategoryId={selectedCategoryId}
-        selectedBrandId={selectedBrandId}
+        selectedCategory={selectedCategory}
         selectedPriceRange={selectedPriceRange}
         selectedRating={selectedRating}
         selectedSort={selectedSort}
         selectedDirection={selectedDirection}
-        onCategoryChange={setSelectedCategoryId}
-        onBrandChange={setSelectedBrandId}
+        onCategoryChange={setSelectedCategory}
         onPriceChange={setSelectedPriceRange}
         onRatingChange={setSelectedRating}
         onSortChange={(sort) => {
@@ -204,15 +199,10 @@ const styles = StyleSheet.create({
     maxWidth: "48.5%",
   },
   emptyContainer: {
-    paddingVertical: 48,
-    paddingHorizontal: 20,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 6,
-    backgroundColor: colors.white,
-    marginVertical: 12,
+    paddingVertical: 48,
+    paddingHorizontal: 24,
   },
   emptyTitle: {
     fontSize: 16,
@@ -226,4 +216,3 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
-

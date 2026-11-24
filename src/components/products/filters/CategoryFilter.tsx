@@ -6,7 +6,7 @@ import { Ionicons } from "@react-native-vector-icons/ionicons";
 
 export default function CategoryFilter({
   categories,
-  selectedCategoryId,
+  selectedCategory,
   onChange,
 }: CategoryFilterProps) {
   const [showMore, setShowMore] = useState(false);
@@ -14,20 +14,12 @@ export default function CategoryFilter({
   const visibleCategories = categories.slice(0, 4);
   const hiddenCategories = categories.slice(4);
 
-  const handleCategoryChange = (categoryId: number) => {
-    if (selectedCategoryId === categoryId) {
-      onChange(null);
-      return;
-    }
-    onChange(categoryId);
-  };
-
-  const renderOption = (cat: (typeof categories)[number]) => {
-    const isChecked = selectedCategoryId === cat.categoryId;
+  const renderOption = (cat: string) => {
+    const isChecked = selectedCategory?.toLowerCase() === cat.toLowerCase();
     return (
       <Pressable
-        key={cat.categoryId}
-        onPress={() => handleCategoryChange(cat.categoryId)}
+        key={cat}
+        onPress={() => onChange(isChecked ? null : cat)}
         style={styles.optionRow}
         accessibilityRole="checkbox"
         accessibilityState={{ checked: isChecked }}
@@ -36,13 +28,13 @@ export default function CategoryFilter({
           {isChecked && <Ionicons name="checkmark" size={11} color={colors.white} />}
         </View>
         <Text style={[styles.optionText, isChecked && styles.optionTextActive]}>
-          {cat.name.toUpperCase()}
+          {cat.toUpperCase()}
         </Text>
       </Pressable>
     );
   };
 
-  const isAllChecked = selectedCategoryId === null;
+  const isAllChecked = selectedCategory === null;
 
   return (
     <View style={styles.container}>
@@ -98,7 +90,7 @@ const styles = StyleSheet.create({
   checkbox: {
     width: 16,
     height: 16,
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: colors.borderDark,
     borderRadius: 3,
     backgroundColor: colors.white,
@@ -106,22 +98,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   checkboxChecked: {
-    borderColor: colors.orange,
     backgroundColor: colors.orange,
+    borderColor: colors.orange,
   },
   optionText: {
     fontSize: 12,
     color: colors.charcoal,
+    letterSpacing: 0.3,
   },
   optionTextActive: {
     color: colors.orange,
-    fontWeight: "600",
+    fontWeight: "700",
   },
   moreButton: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    marginTop: 4,
+    paddingVertical: 2,
   },
   moreText: {
     fontSize: 12,
@@ -129,4 +122,3 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
-

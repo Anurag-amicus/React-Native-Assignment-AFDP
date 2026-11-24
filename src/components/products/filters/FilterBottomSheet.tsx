@@ -10,11 +10,9 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@react-native-vector-icons/ionicons";
-import type { BrandItem, CategoryItem } from "@/types/product";
 import type { PriceRange, SortDirection, SortOption } from "@/types/filter";
 import { colors } from "@/theme/colors";
 import CategoryFilter from "./CategoryFilter";
-import BrandFilter from "./BrandFilter";
 import PriceFilter from "./PriceFilter";
 import RatingFilter from "./RatingFilter";
 import SortFilter from "./SortFilter";
@@ -22,16 +20,13 @@ import SortFilter from "./SortFilter";
 export interface FilterBottomSheetProps {
   visible: boolean;
   onClose: () => void;
-  categories: CategoryItem[];
-  brands: BrandItem[];
-  selectedCategoryId: number | null;
-  selectedBrandId: number | null;
+  categories: string[];
+  selectedCategory: string | null;
   selectedPriceRange: PriceRange | null;
   selectedRating: number | null;
   selectedSort: SortOption | null;
   selectedDirection: SortDirection;
-  onCategoryChange: (categoryId: number | null) => void;
-  onBrandChange: (brandId: number | null) => void;
+  onCategoryChange: (category: string | null) => void;
   onPriceChange: (priceRange: PriceRange | null) => void;
   onRatingChange: (rating: number | null) => void;
   onSortChange: (sort: SortOption) => void;
@@ -44,15 +39,12 @@ export default function FilterBottomSheet({
   visible,
   onClose,
   categories,
-  brands,
-  selectedCategoryId,
-  selectedBrandId,
+  selectedCategory,
   selectedPriceRange,
   selectedRating,
   selectedSort,
   selectedDirection,
   onCategoryChange,
-  onBrandChange,
   onPriceChange,
   onRatingChange,
   onSortChange,
@@ -63,8 +55,7 @@ export default function FilterBottomSheet({
   const insets = useSafeAreaInsets();
 
   const activeCount =
-    (selectedCategoryId !== null ? 1 : 0) +
-    (selectedBrandId !== null ? 1 : 0) +
+    (selectedCategory !== null ? 1 : 0) +
     (selectedPriceRange !== null ? 1 : 0) +
     (selectedRating !== null ? 1 : 0) +
     (selectedSort !== null ? 1 : 0);
@@ -148,22 +139,12 @@ export default function FilterBottomSheet({
               <Text style={styles.sectionTitle}>Category</Text>
               <CategoryFilter
                 categories={categories}
-                selectedCategoryId={selectedCategoryId}
+                selectedCategory={selectedCategory}
                 onChange={onCategoryChange}
               />
             </View>
 
-            {/* 3. Brand Section */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Brand</Text>
-              <BrandFilter
-                brands={brands}
-                selectedBrandId={selectedBrandId}
-                onChange={onBrandChange}
-              />
-            </View>
-
-            {/* 4. Price Range Section */}
+            {/* 3. Price Range Section */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Price Range</Text>
               <PriceFilter
@@ -172,7 +153,7 @@ export default function FilterBottomSheet({
               />
             </View>
 
-            {/* 5. Rating Section */}
+            {/* 4. Rating Section */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Customer Rating</Text>
               <RatingFilter
@@ -336,4 +317,3 @@ const styles = StyleSheet.create({
     letterSpacing: 0.8,
   },
 });
-

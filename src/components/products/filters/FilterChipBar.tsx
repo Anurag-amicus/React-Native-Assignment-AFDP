@@ -7,15 +7,12 @@ import {
   View,
 } from "react-native";
 import { Ionicons } from "@react-native-vector-icons/ionicons";
-import type { BrandItem, CategoryItem } from "@/types/product";
 import type { PriceRange, SortOption } from "@/types/filter";
 import { colors } from "@/theme/colors";
 
 export interface FilterChipBarProps {
-  categories: CategoryItem[];
-  brands: BrandItem[];
-  selectedCategoryId: number | null;
-  selectedBrandId: number | null;
+  categories: string[];
+  selectedCategory: string | null;
   selectedPriceRange: PriceRange | null;
   selectedRating: number | null;
   selectedSort: SortOption | null;
@@ -24,10 +21,7 @@ export interface FilterChipBarProps {
 }
 
 export default function FilterChipBar({
-  categories,
-  brands,
-  selectedCategoryId,
-  selectedBrandId,
+  selectedCategory,
   selectedPriceRange,
   selectedRating,
   selectedSort,
@@ -35,19 +29,13 @@ export default function FilterChipBar({
   onClearAll,
 }: FilterChipBarProps) {
   const activeCount =
-    (selectedCategoryId !== null ? 1 : 0) +
-    (selectedBrandId !== null ? 1 : 0) +
+    (selectedCategory !== null ? 1 : 0) +
     (selectedPriceRange !== null ? 1 : 0) +
     (selectedRating !== null ? 1 : 0) +
     (selectedSort !== null ? 1 : 0);
 
-  const selectedCategoryName = categories.find(
-    (c) => c.categoryId === selectedCategoryId
-  )?.name;
-
-  const selectedBrandName = brands.find(
-    (b) => b.brandId === selectedBrandId
-  )?.name;
+  const formatCategoryName = (cat: string) =>
+    cat.charAt(0).toUpperCase() + cat.slice(1);
 
   const chips: {
     key: string;
@@ -67,14 +55,8 @@ export default function FilterChipBar({
     },
     {
       key: "category",
-      label: selectedCategoryName ? `${selectedCategoryName}` : "Category ▾",
-      isActive: selectedCategoryId !== null,
-      action: onOpenFilter,
-    },
-    {
-      key: "brand",
-      label: selectedBrandName ? `${selectedBrandName}` : "Brand ▾",
-      isActive: selectedBrandId !== null,
+      label: selectedCategory ? `${formatCategoryName(selectedCategory)}` : "Category ▾",
+      isActive: selectedCategory !== null,
       action: onOpenFilter,
     },
     {

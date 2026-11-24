@@ -1,15 +1,7 @@
-import type { CategoryItem, BrandItem } from "./product";
-
 export type CategoryFilterProps = {
-  categories: CategoryItem[];
-  selectedCategoryId: number | null;
-  onChange: (categoryId: number | null) => void;
-};
-
-export type BrandFilterProps = {
-  brands: BrandItem[];
-  selectedBrandId: number | null;
-  onChange: (brandId: number | null) => void;
+  categories: string[];
+  selectedCategory: string | null;
+  onChange: (category: string | null) => void;
 };
 
 export type SortOption = "name" | "price" | "rating";
@@ -38,4 +30,3 @@ export interface PriceFilterProps {
   selectedPriceRange: PriceRange | null;
   onChange: (priceRange: PriceRange | null) => void;
 }
-

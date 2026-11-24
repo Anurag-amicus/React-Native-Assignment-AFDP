@@ -19,7 +19,9 @@ export default function FeaturedSection() {
 
   useEffect(() => {
     productService.getProducts({}).then((res) => {
-      setProducts(res.products);
+      if (res.success) {
+        setProducts(res.data.products);
+      }
     });
   }, []);
 
