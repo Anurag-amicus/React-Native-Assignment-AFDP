@@ -3,6 +3,7 @@ import {
   FlatList,
   Image,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -57,15 +58,52 @@ const DEFAULT_META: CategoryMeta = {
 
 export default function CategorySection() {
   const [categories, setCategories] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    productService.getCategories().then((res) => {
-      if (res.success) {
-        setCategories(res.data);
-      }
-    });
+    const controller = new AbortController();
+    let isCurrent = true;
+
+    productService
+      .getCategories({ signal: controller.signal })
+      .then((res) => {
+        if (!isCurrent) return;
+        if (res.success) {
+          setCategories(res.data);
+        }
+      })
+      .finally(() => {
+        if (isCurrent) setLoading(false);
+      });
+
+    return () => {
+      isCurrent = false;
+      controller.abort();
+    };
   }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.headerRow}>
+          <View>
+            <Text style={styles.title}>Shop by Category</Text>
+            <Text style={styles.subtitle}>Curated collections designed for you</Text>
+          </View>
+        </View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.listContainer}
+        >
+          {[1, 2, 3, 4].map((id) => (
+            <View key={id} style={[styles.categoryCard, styles.skeletonCard]} />
+          ))}
+        </ScrollView>
+      </View>
+    );
+  }
 
   if (categories.length === 0) return null;
 
@@ -213,6 +251,9 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 6,
+  },
+  skeletonCard: {
+    backgroundColor: colors.surface,
   },
   categoryCardPressed: {
     opacity: 0.9,
