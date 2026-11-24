@@ -61,19 +61,8 @@ class ProductService {
       list = list.filter(
         (p) =>
           p.name.toLowerCase().includes(q) ||
-          p.category.toLowerCase().includes(q) ||
-          (p.brandName && p.brandName.toLowerCase().includes(q))
+          p.category.toLowerCase().includes(q)
       );
-    }
-
-    // 2. Category filter
-    if (params.categoryId !== null && params.categoryId !== undefined) {
-      list = list.filter((p) => p.categoryId === params.categoryId);
-    }
-
-    // 3. Brand filter
-    if (params.brandId !== null && params.brandId !== undefined) {
-      list = list.filter((p) => p.brandId === params.brandId);
     }
 
     // 4. Price range filter

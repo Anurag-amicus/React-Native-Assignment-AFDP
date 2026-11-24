@@ -57,7 +57,7 @@ export default function TopAppBar({ cartCount = 0 }: TopAppBarProps) {
         <View style={styles.topRow}>
           {/* Brand Identity */}
           <Pressable
-            onPress={() => router.push("/index")}
+            onPress={() => router.push("/(tabs)")}
             accessibilityRole="button"
             accessibilityLabel="Online Express, Go to Home"
             style={styles.brandContainer}

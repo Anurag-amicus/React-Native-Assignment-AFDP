@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Alert,
   Image,
@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import type { Product } from "@/types/product";
 import { Ionicons } from "@react-native-vector-icons/ionicons";
+import QuantitySelector from "@/components/common/QuantitySelector";
 import { colors } from "@/theme/colors";
 
 export function ProductCard({
@@ -18,10 +19,13 @@ export function ProductCard({
   rating,
   imageUrl,
 }: Product) {
+  const [quantity, setQuantity] = useState(1);
+  const totalPrice = price * quantity;
+
   const handleAddToCart = () => {
     Alert.alert(
       "Added to Cart",
-      `${name}\nPrice: ₹${price.toLocaleString("en-IN")}`,
+      `${quantity} × ${name}\nTotal: ₹${totalPrice.toLocaleString("en-IN")}`,
       [{ text: "OK" }]
     );
   };
@@ -55,11 +59,21 @@ export function ProductCard({
           {name}
         </Text>
 
-        {/* Price Display */}
-        <View style={styles.priceRow}>
-          <Text style={styles.price}>
-            ₹{price.toLocaleString("en-IN")}
-          </Text>
+        {/* Dynamic Price & Quantity Stepper Row (Space Between) */}
+        <View style={styles.priceAndQuantityRow}>
+          <View style={styles.priceContainer}>
+            <Text style={styles.price} numberOfLines={1}>
+              ₹{totalPrice.toLocaleString("en-IN")}
+            </Text>
+          </View>
+
+          <QuantitySelector
+            quantity={quantity}
+            onChange={setQuantity}
+            min={1}
+            max={20}
+            size="small"
+          />
         </View>
 
         {/* Modern Add to Cart Pill Button */}
@@ -70,7 +84,7 @@ export function ProductCard({
             pressed && styles.addButtonPressed,
           ]}
           accessibilityRole="button"
-          accessibilityLabel={`Add ${name} to cart`}
+          accessibilityLabel={`Add ${quantity} of ${name} to cart`}
         >
           <Ionicons name="cart-outline" size={13} color={colors.white} />
           <Text style={styles.addButtonText}>ADD TO CART</Text>
@@ -151,16 +165,30 @@ const styles = StyleSheet.create({
     minHeight: 32,
     marginBottom: 6,
   },
-  priceRow: {
+  priceAndQuantityRow: {
     flexDirection: "row",
-    alignItems: "baseline",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: 8,
+    width: "100%",
+    minHeight: 28,
+  },
+  priceContainer: {
+    flex: 1,
+    marginRight: 6,
+    justifyContent: "center",
   },
   price: {
-    fontSize: 14.5,
+    fontSize: 14,
     fontWeight: "800",
     color: colors.charcoal,
     letterSpacing: -0.3,
+  },
+  unitPriceText: {
+    fontSize: 9.5,
+    fontWeight: "600",
+    color: colors.muted,
+    marginTop: 1,
   },
   addButton: {
     width: "100%",

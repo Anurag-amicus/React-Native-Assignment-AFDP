@@ -24,7 +24,7 @@ export interface SidebarDrawerProps {
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
 
-type RoutePath = "/index" | "/explore" | "/cart" | "/profile";
+type RoutePath = "/(tabs)" | "/explore" | "/cart" | "/profile";
 
 interface NavItemConfig {
   key: string;
@@ -39,10 +39,10 @@ const NAV_ITEMS: NavItemConfig[] = [
   {
     key: "home",
     label: "Home",
-    href: "/index",
+    href: "/(tabs)",
     icon: "home-outline",
     iconActive: "home",
-    isActive: (pathname) => pathname === "/" || pathname === "/index" || pathname === "/welcome" || pathname === "/home",
+    isActive: (pathname) => pathname === "/" || pathname === "/(tabs)" || pathname === "/welcome" || pathname === "/home",
   },
   {
     key: "explore",

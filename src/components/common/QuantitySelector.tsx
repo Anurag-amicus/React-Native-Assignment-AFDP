@@ -1,19 +1,21 @@
 import React from "react";
 import {
+  Pressable,
   StyleProp,
   StyleSheet,
   Text,
   View,
   ViewStyle,
 } from "react-native";
+import { Ionicons } from "@react-native-vector-icons/ionicons";
 import { colors } from "@/theme/colors";
-import Button from "./Button";
 
 export type QuantitySelectorProps = {
   quantity: number;
   onChange: (newQuantity: number) => void;
   min?: number;
   max?: number;
+  size?: "small" | "medium";
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
 };
@@ -23,11 +25,13 @@ export default function QuantitySelector({
   onChange,
   min = 1,
   max = 50,
+  size = "medium",
   disabled = false,
   style,
 }: QuantitySelectorProps) {
   const atMin = quantity <= min;
   const atMax = quantity >= max;
+  const isSmall = size === "small";
 
   const handleDecrease = () => {
     if (disabled || atMin) return;
@@ -42,90 +46,112 @@ export default function QuantitySelector({
   return (
     <View
       style={[
-        styles.selector,
-        disabled && styles.selectorDisabled,
+        styles.container,
+        isSmall && styles.containerSmall,
+        disabled && styles.containerDisabled,
         style,
       ]}
     >
-      {/* Decrease Button using Reusable Button */}
-      <Button
-        variant="generic"
-        disabled={disabled || atMin}
+      {/* Decrease Button */}
+      <Pressable
         onPress={handleDecrease}
-        style={[styles.stepButton, styles.stepLeft]}
-        textStyle={[styles.stepText, atMin && styles.stepTextDisabled]}
+        disabled={disabled || atMin}
+        hitSlop={4}
+        style={({ pressed }) => [
+          styles.stepButton,
+          isSmall && styles.stepButtonSmall,
+          pressed && !atMin && styles.stepButtonPressed,
+        ]}
+        accessibilityRole="button"
+        accessibilityLabel="Decrease quantity"
+        accessibilityState={{ disabled: disabled || atMin }}
       >
-        −
-      </Button>
+        <Ionicons
+          name="remove"
+          size={isSmall ? 13 : 15}
+          color={disabled || atMin ? "#94a3b8" : colors.charcoal}
+        />
+      </Pressable>
 
-      {/* Current Quantity */}
-      <View style={styles.countBox}>
-        <Text style={styles.countText}>{quantity}</Text>
+      {/* Numeric Display */}
+      <View style={[styles.countContainer, isSmall && styles.countContainerSmall]}>
+        <Text style={[styles.countText, isSmall && styles.countTextSmall]}>
+          {quantity}
+        </Text>
       </View>
 
-      {/* Increase Button using Reusable Button */}
-      <Button
-        variant="generic"
-        disabled={disabled || atMax}
+      {/* Increase Button */}
+      <Pressable
         onPress={handleIncrease}
-        style={[styles.stepButton, styles.stepRight]}
-        textStyle={[styles.stepText, atMax && styles.stepTextDisabled]}
+        disabled={disabled || atMax}
+        hitSlop={4}
+        style={({ pressed }) => [
+          styles.stepButton,
+          isSmall && styles.stepButtonSmall,
+          pressed && !atMax && styles.stepButtonPressed,
+        ]}
+        accessibilityRole="button"
+        accessibilityLabel="Increase quantity"
+        accessibilityState={{ disabled: disabled || atMax }}
       >
-        +
-      </Button>
+        <Ionicons
+          name="add"
+          size={isSmall ? 13 : 15}
+          color={disabled || atMax ? "#94a3b8" : colors.charcoal}
+        />
+      </Pressable>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  selector: {
+  container: {
     flexDirection: "row",
     alignItems: "center",
-    height: 32,
+    backgroundColor: "#f1f5f9",
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: "#e2e8f0",
     borderRadius: 16,
+    height: 30,
     overflow: "hidden",
-    backgroundColor: colors.white,
-    alignSelf: "center",
   },
-  selectorDisabled: {
+  containerSmall: {
+    height: 26,
+    borderRadius: 13,
+  },
+  containerDisabled: {
     opacity: 0.5,
   },
   stepButton: {
-    width: 32,
-    height: 32,
-    paddingVertical: 0,
-    paddingHorizontal: 0,
-    borderRadius: 0,
+    width: 28,
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "transparent",
+  },
+  stepButtonSmall: {
+    width: 24,
+  },
+  stepButtonPressed: {
+    backgroundColor: "#e2e8f0",
+  },
+  countContainer: {
+    minWidth: 26,
+    paddingHorizontal: 4,
     alignItems: "center",
     justifyContent: "center",
   },
-  stepLeft: {
-    borderRightWidth: 1,
-    borderRightColor: colors.border,
-  },
-  stepRight: {
-    borderLeftWidth: 1,
-    borderLeftColor: colors.border,
-  },
-  stepText: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: colors.black,
-    lineHeight: 20,
-  },
-  stepTextDisabled: {
-    color: colors.muted,
-  },
-  countBox: {
-    width: 44,
-    alignItems: "center",
-    justifyContent: "center",
+  countContainerSmall: {
+    minWidth: 22,
+    paddingHorizontal: 2,
   },
   countText: {
-    fontSize: 14,
+    fontSize: 12.5,
     fontWeight: "700",
-    color: colors.black,
+    color: colors.charcoal,
+  },
+  countTextSmall: {
+    fontSize: 11,
+    fontWeight: "700",
   },
 });

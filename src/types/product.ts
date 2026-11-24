@@ -1,13 +1,25 @@
+export interface ProductRating {
+  rate: number;
+  count: number;
+}
+
+export interface ProductResponse {
+  id: number;
+  title: string;
+  price: number;
+  description: string;
+  category: string;
+  image: string;
+  rating?: ProductRating;
+}
+
 export interface Product {
   id: number;
   name: string;
   category: string;
-  categoryId?: number;
   price: number;
   rating: number;
   imageUrl: string;
-  brandName?: string;
-  brandId?: number;
   description?: string;
 }
 
