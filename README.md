@@ -162,6 +162,74 @@ Build Home Screen with header, hero banner, categories, featured products and fo
 
 ---
 
+### Assignment 7 — Fetch & Display Products from REST API
+
+**Problem Statement:**
+Use `useEffect` and `fetch`/Axios to load products from API with loading, error and success states.
+
+**Key Deliverables & Implementation:**
+
+1. **Pure Fetch API Client ([`src/services/apiClient.ts`](src/services/apiClient.ts)):**
+   - Lightweight, standalone fetch wrapper returning a strongly typed `ApiResult<T>` discriminated union (`{ success: true, data: T } | { success: false, status: number, error: string }`).
+   - Standardizes JSON/text error parsing and intercepts `AbortError` cleanly with status `499` ("Request was cancelled.").
+
+2. **Live REST API Integration ([`src/services/productService.ts`](src/services/productService.ts)):**
+   - Directly fetches live catalog data from FakeStore API (`https://fakestoreapi.com/products` and `https://fakestoreapi.com/products/categories`).
+   - Maps raw `ProductResponse` DTOs into clean domain `Product` models with INR price scaling.
+   - Executes client-side multi-faceted filtering (string category matching, price range, rating threshold) and multi-field sorting on the fetched product array.
+   - Returns structured `ApiResult` directly without throwing uncaught exceptions.
+
+3. **Animated Skeleton Loading Cards ([`src/components/products/ProductCardSkeleton.tsx`](src/components/products/ProductCardSkeleton.tsx)):**
+   - Native animated looping pulse skeleton card replicating the exact visual layout and dimensions of `ProductCard` (image placeholder, category badge, 2-line title, price, and action button).
+   - Provides `ProductGridSkeleton` for 2-column virtualized list loading, eliminating jarring spinners.
+
+4. **Error & Retry Handling ([`src/app/(tabs)/explore.tsx`](src/app/(tabs)/explore.tsx)):**
+   - User-friendly error view displaying an alert circle icon, clear status message, and an interactive **"Try Again"** button to retry failed requests.
+
+5. **Pull-to-Refresh Functionality:**
+   - Native `RefreshControl` integrated into the Explore screen's `FlatList` with brand color palette (`colors.orange`), allowing smooth pull-down refreshes without unmounting the list or interrupting user flow.
+
+6. **`AbortController` Lifecycle Cleanup:**
+   - Full `AbortController` integration in `useEffect` across Explore Screen and Home Screen sections (`FeaturedSection` & `CategorySection`).
+   - Automatically cancels pending requests on rapid filter/search inputs or screen unmounts, preventing state leaks and out-of-order responses.
+
+7. **Production Performance & Architecture Optimizations:**
+   - **`useDebounce` Hook ([`src/hooks/useDebounce.ts`](src/hooks/useDebounce.ts)):** 300ms debounce on search queries to eliminate redundant API/filter computations on every keystroke.
+   - **Pure `async / await` Architecture:** All legacy `.then` and `Promise.resolve().then` chains converted to standard `try / catch / finally` blocks with early unmount guards (`isCurrent`).
+   - **Route Params as Single Source of Truth:** Replaced redundant mirrored local state and render-time comparisons with Expo Router's `router.setParams()`.
+   - **Optimized Image Pipeline (`expo-image`):** Integrated `expo-image` across `ProductCard`, `CategorySection`, `HeroSection`, and `cart` with `memory-disk` cache policies and fade transitions (`transition={200}`).
+   - **Synchronized Skeleton Pulse (`usePulseAnimation`):** Unified skeleton pulse timer driving all cards simultaneously, preventing duplicate animation loops.
+   - **Virtualized FlatList Tuning:** Configured `initialNumToRender`, `maxToRenderPerBatch`, `windowSize`, and `removeClippedSubviews` for smooth 60fps scrolling and reduced memory consumption on mobile.
+
+---
+
+### Assignment 8 — Product Listing with Search & Filter
+
+**Problem Statement:**
+Implement real-time search, category filter, sorting and empty states in product listing.
+
+**Key Deliverables & Implementation:**
+
+1. **Dual Action Toolbar ([`src/components/products/filters/FilterSortBar.tsx`](src/components/products/filters/FilterSortBar.tsx)):**
+   - 50/50 split mobile action bar positioned directly beneath the live SearchBar:
+     - **Left (`Filter`):** Shows options icon with active badge dot, opening the Category Filter bottom sheet.
+     - **Right (`Sort`):** Shows swap vertical icon with active badge dot, opening the Sort bottom sheet.
+
+2. **Category Filter Slide-Up Sheet ([`src/components/products/filters/FilterBottomSheet.tsx`](src/components/products/filters/FilterBottomSheet.tsx)):**
+   - Dedicated category bottom sheet with drag handle, active count indicator, `"Reset"` action, and the full category checkbox hierarchy (`All`, `Electronics`, `Jewelery`, `Men's Clothing`, `Women's Clothing`, and `More / Less`).
+
+3. **Sort Slide-Up Sheet ([`src/components/products/filters/SortBottomSheet.tsx`](src/components/products/filters/SortBottomSheet.tsx)):**
+   - Dedicated sorting bottom sheet with `"Clear"` action, expandable sort direction selectors (`Price: Low to High / High to Low`, `Rating: High to Low`, `Name: A → Z / Z → A`), and a sticky `"APPLY SORT"` footer.
+
+4. **High-Performance In-Memory Filter Engine (`useMemo` in [`src/app/(tabs)/explore.tsx`](src/app/(tabs)/explore.tsx)):**
+   - Fetches FakeStore API data once on mount or pull-to-refresh, eliminating redundant network roundtrips.
+   - Combines debounced search, active category, and sort criteria with 0ms latency and zero skeleton flickering when toggling filters.
+
+5. **Empty State UI:**
+   - Displays a clean search illustration, friendly message, and a one-tap `"Reset All Filters"` button that restores default listings.
+
+---
+
 ## 📁 Project Structure
 
 ```text
@@ -181,6 +249,7 @@ src/
 │   │   ├── Button.tsx           # Reusable Button component (variants, sizes, disabled)
 │   │   ├── Card.tsx             # Reusable Card container (variants)
 │   │   ├── CtaCard.tsx          # Composed CTA Card component
+│   │   ├── ErrorView.tsx        # Reusable error state component with retry action
 │   │   └── QuantitySelector.tsx # Reusable stepper pill with min/max disabled bounds
 │   ├── home/
 │   │   ├── CategorySection.tsx  # Visual category cards horizontal scroll
@@ -191,26 +260,27 @@ src/
 │   │   └── TopAppBar.tsx        # Brand logo, cart badge & floating search bar
 │   └── products/
 │       ├── filters/
-│       │   ├── BrandFilter.tsx       # Brand checkboxes with "More/Less"
 │       │   ├── CategoryFilter.tsx    # Category checkboxes with "More/Less"
-│       │   ├── FilterBottomSheet.tsx # Native slide-up filter sheet modal
-│       │   ├── FilterChipBar.tsx     # Horizontal quick-filter chips bar
-│       │   ├── PriceFilter.tsx       # Price range checkboxes
-│       │   ├── RatingFilter.tsx      # Star rating threshold checkboxes
+│       │   ├── FilterBottomSheet.tsx # Category slide-up filter sheet modal
+│       │   ├── FilterSortBar.tsx     # 50/50 Dual action bar (Filter left, Sort right)
+│       │   ├── SortBottomSheet.tsx   # Sorting slide-up sheet modal
 │       │   └── SortFilter.tsx        # Radio group with expand/collapse sort directions
-│       ├── ProductCard.tsx        # Modern ProductCard with floating rating & add pill
-│       └── ProductCountBar.tsx    # Dynamic results count & active sort indicator
-├── data/
-│   └── products.json            # Product catalogue with categoryId & brandId
+│       ├── ProductCard.tsx           # Modern ProductCard with floating rating & add pill
+│       ├── ProductCardSkeleton.tsx   # Pulsing animated skeleton loading card & grid
+│       └── ProductCountBar.tsx       # Dynamic results count & active sort indicator
+├── hooks/
+│   └── useDebounce.ts           # Reusable generic debounce hook with timer cleanup
 ├── services/
+│   ├── apiClient.ts             # Lightweight fetch wrapper with AbortError handling & ApiResult
 │   └── productService.ts        # Async service layer for fetching, filtering & sorting
 ├── theme/
 │   └── colors.ts                # Centralized color tokens
 └── types/
+    ├── api.ts                   # ApiResult, ApiSuccess, ApiFailure discriminated union
     ├── button.ts                # Button types, sizes, variants & styles
     ├── card.ts                  # Card & CtaCard types, variants & styles
     ├── filter.ts                # Filter props, ranges, sort options & directions
-    └── product.ts               # Product, CategoryItem, BrandItem & query params
+    └── product.ts               # Product, ProductResponse & query params
 ```
 
 ---
