@@ -1,11 +1,11 @@
 import React from "react";
 import {
-  Image,
   Pressable,
   StyleSheet,
   Text,
   View,
 } from "react-native";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@react-native-vector-icons/ionicons";
@@ -21,14 +21,13 @@ export default function HeroSection() {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        {/* High-Resolution Hero Photography */}
         <Image
           source={require("../../../assets/herosection.png")}
           style={styles.heroImage}
-          resizeMode="cover"
+          contentFit="cover"
+          transition={200}
         />
 
-        {/* Sophisticated Dark-to-Translucent Gradient Scrim for Readability */}
         <LinearGradient
           colors={[
             "rgba(15, 23, 42, 0.88)",
@@ -41,25 +40,20 @@ export default function HeroSection() {
           style={styles.gradientOverlay}
         />
 
-        {/* Hero Card Content */}
         <View style={styles.content}>
-          {/* Curated Collection Eyebrow */}
           <View style={styles.eyebrowBadge}>
             <Ionicons name="sparkles" size={11} color={colors.orange} />
             <Text style={styles.eyebrowText}>CURATED FOR YOU</Text>
           </View>
 
-          {/* Main Headline */}
           <Text style={styles.headline}>
             Find The Right Products
           </Text>
 
-          {/* Subtitle */}
           <Text style={styles.subtitle}>
             Discover quality essentials crafted for everyday style, performance, and durability.
           </Text>
 
-          {/* Modern Primary Action Button */}
           <Pressable
             onPress={handleExplore}
             style={({ pressed }) => [

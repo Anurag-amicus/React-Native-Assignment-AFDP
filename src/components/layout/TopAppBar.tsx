@@ -47,15 +47,11 @@ export default function TopAppBar({ cartCount = 0 }: TopAppBarProps) {
 
   return (
     <>
-      {/* 1. Phone Top Status Bar Safe Area Strip */}
       <View style={[styles.safeAreaBar, { height: insets.top }]} />
       <StatusBar style="light" />
 
-      {/* 2. Main Top App Bar */}
       <View style={styles.container}>
-        {/* Top Row: Brand Logo (Left) & Cart (Right) */}
         <View style={styles.topRow}>
-          {/* Brand Identity */}
           <Pressable
             onPress={() => router.push("/(tabs)")}
             accessibilityRole="button"
@@ -72,7 +68,6 @@ export default function TopAppBar({ cartCount = 0 }: TopAppBarProps) {
             </View>
           </Pressable>
 
-          {/* Right Action: Shopping Cart (No wishlist, no notification) */}
           <Pressable
             onPress={() => router.push("/cart")}
             accessibilityRole="button"
@@ -91,7 +86,6 @@ export default function TopAppBar({ cartCount = 0 }: TopAppBarProps) {
           </Pressable>
         </View>
 
-        {/* 3. Floating Bubble Search Pill (Prominently featured on Home) */}
         {isHomeScreen && (
           <View style={styles.searchPillWrapper}>
             <View style={styles.searchPill}>
@@ -103,7 +97,7 @@ export default function TopAppBar({ cartCount = 0 }: TopAppBarProps) {
               />
               <TextInput
                 style={styles.searchInput}
-                placeholder="Search products, brands, categories..."
+                placeholder="Search products, categories..."
                 placeholderTextColor={colors.muted}
                 value={searchQuery}
                 onChangeText={setSearchQuery}

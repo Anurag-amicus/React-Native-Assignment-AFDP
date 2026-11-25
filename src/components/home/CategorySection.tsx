@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
 import {
   FlatList,
-  Image,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@react-native-vector-icons/ionicons";
+import ErrorView from "@/components/common/ErrorView";
 import { productService } from "@/services/productService";
 import { colors } from "@/theme/colors";
 
@@ -59,23 +60,32 @@ const DEFAULT_META: CategoryMeta = {
 export default function CategorySection() {
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     const controller = new AbortController();
     let isCurrent = true;
 
-    productService
-      .getCategories({ signal: controller.signal })
-      .then((res) => {
-        if (!isCurrent) return;
-        if (res.success) {
+    async function fetchCategories() {
+      try {
+        const res = await productService.getCategories({ signal: controller.signal });
+        if (isCurrent && res.success) {
           setCategories(res.data);
+          setError(null);
         }
-      })
-      .finally(() => {
-        if (isCurrent) setLoading(false);
-      });
+      } catch (err) {
+        if (isCurrent && !(err instanceof Error && err.name === "AbortError")) {
+          setError("Failed to load categories");
+        }
+      } finally {
+        if (isCurrent) {
+          setLoading(false);
+        }
+      }
+    }
+
+    fetchCategories();
 
     return () => {
       isCurrent = false;
@@ -105,6 +115,17 @@ export default function CategorySection() {
     );
   }
 
+  if (error && categories.length === 0) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.headerRow}>
+          <Text style={styles.title}>Shop by Category</Text>
+        </View>
+        <ErrorView message="Please try again later." />
+      </View>
+    );
+  }
+
   if (categories.length === 0) return null;
 
   const handleCategoryPress = (category: string) => {
@@ -116,7 +137,6 @@ export default function CategorySection() {
 
   return (
     <View style={styles.container}>
-      {/* Section Header */}
       <View style={styles.headerRow}>
         <View>
           <Text style={styles.title}>Shop by Category</Text>
@@ -135,12 +155,14 @@ export default function CategorySection() {
         </Pressable>
       </View>
 
-      {/* Modern Visual Category Cards Horizontal Strip */}
       <FlatList
         data={categories}
         keyExtractor={(item) => `cat-${item}`}
         horizontal
         showsHorizontalScrollIndicator={false}
+        initialNumToRender={4}
+        maxToRenderPerBatch={4}
+        windowSize={3}
         contentContainerStyle={styles.listContainer}
         renderItem={({ item }) => {
           const meta =
@@ -156,14 +178,14 @@ export default function CategorySection() {
               accessibilityRole="button"
               accessibilityLabel={`Shop ${item} category`}
             >
-              {/* Background Image */}
               <Image
                 source={{ uri: meta.imageUrl }}
                 style={styles.cardImage}
-                resizeMode="cover"
+                contentFit="cover"
+                transition={200}
+                cachePolicy="memory-disk"
               />
 
-              {/* Scrim Gradient for Readability */}
               <LinearGradient
                 colors={[
                   "rgba(15, 23, 42, 0.15)",
@@ -174,12 +196,10 @@ export default function CategorySection() {
                 style={styles.scrimGradient}
               />
 
-              {/* Top Category Icon Badge */}
               <View style={styles.iconCircle}>
                 <Ionicons name={meta.icon} size={16} color={colors.orange} />
               </View>
 
-              {/* Bottom Title & Subtitle */}
               <View style={styles.textContainer}>
                 <Text style={styles.categoryName} numberOfLines={1}>
                   {item.charAt(0).toUpperCase() + item.slice(1)}

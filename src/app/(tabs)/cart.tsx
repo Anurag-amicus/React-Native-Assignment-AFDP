@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import {
   Alert,
   FlatList,
-  Image,
   Pressable,
   StyleSheet,
   Text,
   View,
 } from "react-native";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@react-native-vector-icons/ionicons";
 import QuantitySelector from "@/components/common/QuantitySelector";
@@ -122,16 +122,16 @@ export default function CartScreen() {
         }
         renderItem={({ item }) => (
           <View style={styles.cartCard}>
-            {/* Product Thumbnail */}
             <View style={styles.thumbnailContainer}>
               <Image
                 source={{ uri: item.imageUrl }}
                 style={styles.thumbnail}
-                resizeMode="contain"
+                contentFit="contain"
+                transition={200}
+                cachePolicy="memory-disk"
               />
             </View>
 
-            {/* Product Info & Controls */}
             <View style={styles.itemDetails}>
               <View style={styles.itemTopRow}>
                 <View style={styles.titleColumn}>
@@ -141,7 +141,6 @@ export default function CartScreen() {
                   </Text>
                 </View>
 
-                {/* Remove Trash Button */}
                 <Pressable
                   onPress={() => handleRemoveItem(item.id, item.name)}
                   hitSlop={8}
@@ -152,7 +151,6 @@ export default function CartScreen() {
                 </Pressable>
               </View>
 
-              {/* Price & Stepper Row */}
               <View style={styles.itemBottomRow}>
                 <Text style={styles.itemPrice}>
                   ₹{(item.price * item.quantity).toLocaleString("en-IN")}

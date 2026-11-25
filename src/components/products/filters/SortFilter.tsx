@@ -20,7 +20,6 @@ export default function SortFilter({
 
     return (
       <View key={key} style={styles.sortGroup}>
-        {/* Main Radio Row */}
         <View style={styles.radioHeader}>
           <Pressable
             onPress={() => onSortChange(key)}
@@ -36,7 +35,6 @@ export default function SortFilter({
             </Text>
           </Pressable>
 
-          {/* Clear Button (×) */}
           {isSelected && (
             <Pressable
               onPress={onClearSort}
@@ -49,7 +47,6 @@ export default function SortFilter({
           )}
         </View>
 
-        {/* Direction Options (Visible when selected) */}
         {isSelected && (
           <View style={styles.directionContainer}>
             <Pressable

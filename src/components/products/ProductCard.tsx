@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import {
   Alert,
-  Image,
   Pressable,
   StyleSheet,
   Text,
   View,
 } from "react-native";
+import { Image } from "expo-image";
 import type { Product } from "@/types/product";
 import { Ionicons } from "@react-native-vector-icons/ionicons";
 import QuantitySelector from "@/components/common/QuantitySelector";
@@ -32,34 +32,30 @@ export function ProductCard({
 
   return (
     <View style={styles.card}>
-      {/* 1. Product Image & Floating Rating Badge */}
       <View style={styles.imageContainer}>
         <Image
           source={{ uri: imageUrl }}
           style={styles.image}
-          resizeMode="contain"
+          contentFit="contain"
+          transition={200}
+          cachePolicy="memory-disk"
         />
 
-        {/* Floating Rating Badge in Top Right */}
         <View style={styles.ratingBadge}>
           <Ionicons name="star" size={10} color="#f59e0b" />
           <Text style={styles.ratingValue}>{rating.toFixed(1)}</Text>
         </View>
       </View>
 
-      {/* 2. Product Details Content */}
       <View style={styles.content}>
-        {/* Category Tag */}
         <Text style={styles.category} numberOfLines={1}>
           {category}
         </Text>
 
-        {/* Product Title */}
         <Text style={styles.title} numberOfLines={2}>
           {name}
         </Text>
 
-        {/* Dynamic Price & Quantity Stepper Row (Space Between) */}
         <View style={styles.priceAndQuantityRow}>
           <View style={styles.priceContainer}>
             <Text style={styles.price} numberOfLines={1}>
@@ -76,7 +72,6 @@ export function ProductCard({
           />
         </View>
 
-        {/* Modern Add to Cart Pill Button */}
         <Pressable
           onPress={handleAddToCart}
           style={({ pressed }) => [

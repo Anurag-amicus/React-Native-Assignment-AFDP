@@ -26,9 +26,6 @@ export interface Product {
 export interface ProductQueryParams {
   search?: string;
   category?: string | null;
-  minPrice?: number | null;
-  maxPrice?: number | null;
-  minRating?: number | null;
   sortBy?: "name" | "price" | "rating" | null;
   sortOrder?: "asc" | "desc" | null;
   page?: number;

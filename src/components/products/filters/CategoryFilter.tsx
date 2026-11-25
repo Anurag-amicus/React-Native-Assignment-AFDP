@@ -38,7 +38,6 @@ export default function CategoryFilter({
 
   return (
     <View style={styles.container}>
-      {/* "All" Option */}
       <Pressable
         onPress={() => onChange(null)}
         style={styles.optionRow}
@@ -53,13 +52,10 @@ export default function CategoryFilter({
         </Text>
       </Pressable>
 
-      {/* Visible Categories (First 4) */}
       {visibleCategories.map(renderOption)}
 
-      {/* Hidden Categories (if expanded) */}
       {showMore && hiddenCategories.map(renderOption)}
 
-      {/* More / Less Toggle */}
       {hiddenCategories.length > 0 && (
         <Pressable
           onPress={() => setShowMore((prev) => !prev)}

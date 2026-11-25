@@ -10,8 +10,12 @@ import {
 import { useRouter } from "expo-router";
 import { Ionicons } from "@react-native-vector-icons/ionicons";
 import { ProductCard } from "@/components/products/ProductCard";
-import { ProductCardSkeleton } from "@/components/products/ProductCardSkeleton";
+import {
+  ProductCardSkeleton,
+  usePulseAnimation,
+} from "@/components/products/ProductCardSkeleton";
 import { productService } from "@/services/productService";
+import ErrorView from "@/components/common/ErrorView";
 import type { Product } from "@/types/product";
 import { colors } from "@/theme/colors";
 
@@ -19,15 +23,16 @@ export default function FeaturedSection() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const pulseAnim = usePulseAnimation();
   const router = useRouter();
 
   useEffect(() => {
     const controller = new AbortController();
     let isCurrent = true;
 
-    productService
-      .getProducts({}, { signal: controller.signal })
-      .then((res) => {
+    async function fetchFeatured() {
+      try {
+        const res = await productService.getProducts({}, { signal: controller.signal });
         if (!isCurrent) return;
         if (res.success) {
           setProducts(res.data.products.slice(0, 8));
@@ -35,14 +40,18 @@ export default function FeaturedSection() {
         } else if (res.status !== 499) {
           setError(res.error || "Failed to load featured products");
         }
-      })
-      .catch(() => {
-        if (!isCurrent) return;
-        setError("Network error loading featured products");
-      })
-      .finally(() => {
-        if (isCurrent) setLoading(false);
-      });
+      } catch (err) {
+        if (isCurrent && !(err instanceof Error && err.name === "AbortError")) {
+          setError("Network error loading featured products");
+        }
+      } finally {
+        if (isCurrent) {
+          setLoading(false);
+        }
+      }
+    }
+
+    fetchFeatured();
 
     return () => {
       isCurrent = false;
@@ -63,7 +72,7 @@ export default function FeaturedSection() {
         >
           {[1, 2, 3, 4].map((id) => (
             <View key={id} style={styles.cardWrapper}>
-              <ProductCardSkeleton />
+              <ProductCardSkeleton pulseAnim={pulseAnim} />
             </View>
           ))}
         </ScrollView>
@@ -72,14 +81,20 @@ export default function FeaturedSection() {
   }
 
   if (error && products.length === 0) {
-    return null;
+    return (
+      <View style={styles.container}>
+        <View style={styles.headerRow}>
+          <Text style={styles.title}>Featured Products</Text>
+        </View>
+        <ErrorView message="Please try again later." />
+      </View>
+    );
   }
 
   if (products.length === 0) return null;
 
   return (
     <View style={styles.container}>
-      {/* Section Header */}
       <View style={styles.headerRow}>
         <Text style={styles.title}>Featured Products</Text>
 
@@ -94,12 +109,14 @@ export default function FeaturedSection() {
         </Pressable>
       </View>
 
-      {/* Horizontal Scroll List */}
       <FlatList
         data={products}
         keyExtractor={(item) => `featured-${item.id}`}
         horizontal
         showsHorizontalScrollIndicator={false}
+        initialNumToRender={4}
+        maxToRenderPerBatch={4}
+        windowSize={3}
         contentContainerStyle={styles.listContainer}
         renderItem={({ item }) => (
           <View style={styles.cardWrapper}>

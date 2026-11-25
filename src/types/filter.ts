@@ -15,18 +15,3 @@ export type SortFilterProps = {
   onDirectionChange: (direction: SortDirection) => void;
   onClearSort: () => void;
 };
-
-export type RatingFilterProps = {
-  selectedRating: number | null;
-  onChange: (rating: number | null) => void;
-};
-
-export interface PriceRange {
-  min: number;
-  max: number | null;
-}
-
-export interface PriceFilterProps {
-  selectedPriceRange: PriceRange | null;
-  onChange: (priceRange: PriceRange | null) => void;
-}

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 import { colors } from "@/theme/colors";
 
-export function ProductCardSkeleton() {
+export function usePulseAnimation(): Animated.Value {
   const [pulseAnim] = useState(() => new Animated.Value(0.35));
 
   useEffect(() => {
@@ -25,21 +25,28 @@ export function ProductCardSkeleton() {
     return () => pulse.stop();
   }, [pulseAnim]);
 
+  return pulseAnim;
+}
+
+export interface ProductCardSkeletonProps {
+  pulseAnim?: Animated.Value;
+}
+
+export function ProductCardSkeleton({ pulseAnim: externalPulse }: ProductCardSkeletonProps) {
+  const internalPulse = usePulseAnimation();
+  const pulseAnim = externalPulse ?? internalPulse;
+
   return (
     <View style={styles.card}>
-      {/* 1. Image Skeleton Placeholder */}
       <View style={styles.imagePlaceholder}>
         <Animated.View style={[styles.shimmerBox, { opacity: pulseAnim }]} />
       </View>
 
-      {/* 2. Content Skeleton */}
       <View style={styles.content}>
-        {/* Category tag */}
         <Animated.View
           style={[styles.categorySkeleton, { opacity: pulseAnim }]}
         />
 
-        {/* Title Lines */}
         <Animated.View
           style={[styles.titleLine1, { opacity: pulseAnim }]}
         />
@@ -47,7 +54,6 @@ export function ProductCardSkeleton() {
           style={[styles.titleLine2, { opacity: pulseAnim }]}
         />
 
-        {/* Price & Stepper Row */}
         <View style={styles.priceRow}>
           <Animated.View
             style={[styles.priceSkeleton, { opacity: pulseAnim }]}
@@ -57,7 +63,6 @@ export function ProductCardSkeleton() {
           />
         </View>
 
-        {/* Button Skeleton */}
         <Animated.View style={[styles.buttonSkeleton, { opacity: pulseAnim }]} />
       </View>
     </View>
@@ -65,13 +70,14 @@ export function ProductCardSkeleton() {
 }
 
 export function ProductGridSkeleton({ count = 6 }: { count?: number }) {
+  const pulseAnim = usePulseAnimation();
   const skeletons = Array.from({ length: count }, (_, i) => i);
 
   return (
     <View style={styles.gridContainer}>
       {skeletons.map((idx) => (
         <View key={`skeleton-${idx}`} style={styles.gridItem}>
-          <ProductCardSkeleton />
+          <ProductCardSkeleton pulseAnim={pulseAnim} />
         </View>
       ))}
     </View>
@@ -164,4 +170,3 @@ const styles = StyleSheet.create({
     width: "48.5%",
   },
 });
-

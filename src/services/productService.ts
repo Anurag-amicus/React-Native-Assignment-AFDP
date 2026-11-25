@@ -70,20 +70,7 @@ class ProductService {
       list = list.filter((p) => p.category.toLowerCase() === cat);
     }
 
-    // 3. Price range filter
-    if (params.minPrice !== null && params.minPrice !== undefined) {
-      list = list.filter((p) => p.price >= params.minPrice!);
-    }
-    if (params.maxPrice !== null && params.maxPrice !== undefined) {
-      list = list.filter((p) => p.price <= params.maxPrice!);
-    }
-
-    // 4. Rating filter
-    if (params.minRating !== null && params.minRating !== undefined) {
-      list = list.filter((p) => p.rating >= params.minRating!);
-    }
-
-    // 5. Sorting
+    // 3. Sorting
     if (params.sortBy) {
       const order = params.sortOrder === "desc" ? -1 : 1;
       list.sort((a, b) => {

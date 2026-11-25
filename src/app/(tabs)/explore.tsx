@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   FlatList,
+  Platform,
   RefreshControl,
   StyleSheet,
   Text,
@@ -8,24 +9,28 @@ import {
   View,
 } from "react-native";
 import { Ionicons } from "@react-native-vector-icons/ionicons";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import SearchBar from "@/components/layout/SearchBar";
+import FilterSortBar from "@/components/products/filters/FilterSortBar";
+import FilterBottomSheet from "@/components/products/filters/FilterBottomSheet";
+import SortBottomSheet from "@/components/products/filters/SortBottomSheet";
+import ProductCountBar from "@/components/products/ProductCountBar";
 import { ProductCard } from "@/components/products/ProductCard";
 import { ProductGridSkeleton } from "@/components/products/ProductCardSkeleton";
-import FilterChipBar from "@/components/products/filters/FilterChipBar";
-import FilterBottomSheet from "@/components/products/filters/FilterBottomSheet";
-import ProductCountBar from "@/components/products/ProductCountBar";
+import ErrorView from "@/components/common/ErrorView";
 import { productService } from "@/services/productService";
+import { useDebounce } from "@/hooks/useDebounce";
 import type { Product } from "@/types/product";
-import type { PriceRange, SortDirection, SortOption } from "@/types/filter";
+import type { SortDirection, SortOption } from "@/types/filter";
 import { colors } from "@/theme/colors";
 
 export default function ExploreScreen() {
+  const router = useRouter();
   const params = useLocalSearchParams<{ category?: string; search?: string }>();
 
+  // Master product catalog & categories from API
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [totalRecords, setTotalRecords] = useState(0);
 
   // Loading, error, and refresh states
   const [loading, setLoading] = useState(true);
@@ -33,106 +38,114 @@ export default function ExploreScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
 
-  // Filter & Search states
-  const [filtersOpen, setFiltersOpen] = useState(false);
+  // Modals state
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [sortOpen, setSortOpen] = useState(false);
+
+  // Search input state with 300ms debounce
   const [searchQuery, setSearchQuery] = useState(params.search ?? "");
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(
-    params.category ?? null
-  );
-  const [prevCategoryParam, setPrevCategoryParam] = useState(params.category);
-  const [prevSearchParam, setPrevSearchParam] = useState(params.search);
+  const debouncedSearch = useDebounce(searchQuery, 300);
 
-  if (params.category !== prevCategoryParam) {
-    setPrevCategoryParam(params.category);
-    setSelectedCategory(params.category ?? null);
-  }
-  if (params.search !== prevSearchParam) {
-    setPrevSearchParam(params.search);
-    setSearchQuery(params.search ?? "");
-  }
+  // Category filter is driven directly by params.category (source of truth)
+  const selectedCategory = params.category ?? null;
 
-  const [selectedPriceRange, setSelectedPriceRange] = useState<PriceRange | null>(null);
-  const [selectedRating, setSelectedRating] = useState<number | null>(null);
+  // Sorting state
   const [selectedSort, setSelectedSort] = useState<SortOption | null>(null);
   const [selectedDirection, setSelectedDirection] = useState<SortDirection>("asc");
 
-  // Load Categories directly from API on mount with AbortController cleanup
-  useEffect(() => {
-    const controller = new AbortController();
-    productService
-      .getCategories({ signal: controller.signal })
-      .then((res) => {
-        if (res.success) {
-          setCategories(res.data);
-        }
-      });
-
-    return () => {
-      controller.abort();
-    };
-  }, []);
-
-  // Fetch / Filter products whenever any query param or retry trigger changes
+  // Load Categories & Products on mount / refresh
   useEffect(() => {
     const controller = new AbortController();
     let isCurrent = true;
 
-    Promise.resolve().then(() => {
-      if (isCurrent && !refreshing) {
-        setLoading(true);
-        setError(null);
-      }
-    });
-
-    productService
-      .getProducts(
-        {
-          search: searchQuery,
-          category: selectedCategory,
-          minPrice: selectedPriceRange?.min,
-          maxPrice: selectedPriceRange?.max,
-          minRating: selectedRating,
-          sortBy: selectedSort,
-          sortOrder: selectedDirection,
-        },
-        { signal: controller.signal }
-      )
-      .then((res) => {
-        if (!isCurrent) return;
-        if (res.success) {
-          setProducts(res.data.products);
-          setTotalRecords(res.data.totalRecords);
-          setError(null);
-        } else if (res.status !== 499) {
-          // Status 499 is abort, only set error for real failures
-          setError(res.error || "Failed to load products. Please check your connection.");
+    async function fetchData() {
+      try {
+        if (!refreshing) {
+          setLoading(true);
         }
-      })
-      .catch(() => {
+        setError(null);
+
+        const [catRes, prodRes] = await Promise.all([
+          productService.getCategories({ signal: controller.signal }),
+          productService.getProducts(undefined, { signal: controller.signal }),
+        ]);
+
         if (!isCurrent) return;
-        setError("An unexpected network error occurred.");
-      })
-      .finally(() => {
+
+        if (catRes.success) {
+          setCategories(catRes.data);
+        }
+
+        if (prodRes.success) {
+          setAllProducts(prodRes.data.products);
+          setError(null);
+        } else if (prodRes.status !== 499) {
+          setError(prodRes.error || "Failed to load products. Please check your connection.");
+        }
+      } catch (err) {
+        if (isCurrent && !(err instanceof Error && err.name === "AbortError")) {
+          setError("An unexpected network error occurred.");
+        }
+      } finally {
         if (isCurrent) {
           setLoading(false);
           setRefreshing(false);
         }
-      });
+      }
+    }
+
+    fetchData();
 
     return () => {
       isCurrent = false;
       controller.abort();
     };
-  }, [
-    searchQuery,
-    selectedCategory,
-    selectedPriceRange,
-    selectedRating,
-    selectedSort,
-    selectedDirection,
-    retryKey,
-    refreshing,
-  ]);
+  }, [retryKey, refreshing]);
+
+  // Combined In-Memory Filter & Sort 
+  const filteredProducts = useMemo(() => {
+    let list = allProducts;
+
+    // 1. Search Filter (debounced)
+    if (debouncedSearch && debouncedSearch.trim() !== "") {
+      const q = debouncedSearch.trim().toLowerCase();
+      list = list.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          p.category.toLowerCase().includes(q) ||
+          (p.description && p.description.toLowerCase().includes(q))
+      );
+    }
+
+    // 2. Category Filter
+    if (selectedCategory && selectedCategory.trim() !== "") {
+      const cat = selectedCategory.trim().toLowerCase();
+      list = list.filter((p) => p.category.toLowerCase() === cat);
+    }
+
+    // 3. Sorting Options
+    if (selectedSort) {
+      list = [...list].sort((a, b) => {
+        if (selectedSort === "name") {
+          const cmp = a.name.localeCompare(b.name);
+          return selectedDirection === "desc" ? -cmp : cmp;
+        }
+        if (selectedSort === "price") {
+          return selectedDirection === "desc"
+            ? b.price - a.price
+            : a.price - b.price;
+        }
+        if (selectedSort === "rating") {
+          return selectedDirection === "desc"
+            ? b.rating - a.rating
+            : a.rating - b.rating;
+        }
+        return 0;
+      });
+    }
+
+    return list;
+  }, [allProducts, debouncedSearch, selectedCategory, selectedSort, selectedDirection]);
 
   const handleRefresh = useCallback(() => {
     setRefreshing(true);
@@ -145,45 +158,46 @@ export default function ExploreScreen() {
     setRetryKey((prev) => prev + 1);
   };
 
+  const handleCategorySelect = (category: string | null) => {
+    router.setParams({ category: category || undefined });
+  };
+
+  const handleResetCategory = () => {
+    router.setParams({ category: undefined });
+  };
+
   const handleClearSort = () => {
     setSelectedSort(null);
-    setSelectedDirection(null);
+    setSelectedDirection("asc");
   };
 
   const handleResetAllFilters = () => {
-    setSelectedCategory(null);
-    setSelectedPriceRange(null);
-    setSelectedRating(null);
+    setSearchQuery("");
     setSelectedSort(null);
-    setSelectedDirection(null);
+    setSelectedDirection("asc");
+    router.setParams({ category: undefined, search: undefined });
   };
 
   const renderHeader = () => (
     <View style={styles.headerControls}>
-      {/* 1. Live Search Bar (Floating Bubble Pill) */}
       <SearchBar
         value={searchQuery}
         onChangeText={setSearchQuery}
         placeholder="Search products, categories..."
       />
 
-      {/* 2. Horizontal Filter Chips Bar */}
-      <FilterChipBar
-        categories={categories}
-        selectedCategory={selectedCategory}
-        selectedPriceRange={selectedPriceRange}
-        selectedRating={selectedRating}
-        selectedSort={selectedSort}
-        onOpenFilter={() => setFiltersOpen(true)}
-        onClearAll={handleResetAllFilters}
+      <FilterSortBar
+        hasActiveFilter={selectedCategory !== null}
+        hasActiveSort={selectedSort !== null}
+        onPressFilter={() => setFilterOpen(true)}
+        onPressSort={() => setSortOpen(true)}
       />
 
-      {/* 3. Dynamic Results Count & Sorting Status Bar */}
       {!loading && !error && (
         <ProductCountBar
-          currentCount={products.length}
-          totalCount={totalRecords}
-          searchQuery={searchQuery}
+          currentCount={filteredProducts.length}
+          totalCount={allProducts.length}
+          searchQuery={debouncedSearch}
           sortBy={selectedSort}
           sortOrder={selectedDirection}
         />
@@ -197,23 +211,7 @@ export default function ExploreScreen() {
     }
 
     if (error) {
-      return (
-        <View style={styles.errorContainer}>
-          <View style={styles.errorIconCircle}>
-            <Ionicons name="alert-circle-outline" size={44} color="#ef4444" />
-          </View>
-          <Text style={styles.errorTitle}>Failed to Load Products</Text>
-          <Text style={styles.errorMessage}>{error}</Text>
-          <TouchableOpacity
-            style={styles.retryButton}
-            onPress={handleRetry}
-            activeOpacity={0.8}
-          >
-            <Ionicons name="refresh" size={16} color={colors.white} />
-            <Text style={styles.retryButtonText}>Try Again</Text>
-          </TouchableOpacity>
-        </View>
-      );
+      return <ErrorView message="Please try again later." onRetry={handleRetry} />;
     }
 
     return (
@@ -223,19 +221,15 @@ export default function ExploreScreen() {
         </View>
         <Text style={styles.emptyTitle}>No products found</Text>
         <Text style={styles.emptySubtitle}>
-          Try changing your search terms or resetting filters.
+          {"We couldn't find anything matching your search and filter criteria."}
         </Text>
-        {(searchQuery ||
-          selectedCategory ||
-          selectedPriceRange ||
-          selectedRating ||
-          selectedSort) && (
+        {(searchQuery || selectedCategory || selectedSort) && (
           <TouchableOpacity
             style={styles.resetButton}
             onPress={handleResetAllFilters}
             activeOpacity={0.8}
           >
-            <Text style={styles.resetButtonText}>Reset Filters</Text>
+            <Text style={styles.resetButtonText}>Reset All Filters</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -244,12 +238,19 @@ export default function ExploreScreen() {
 
   return (
     <View style={styles.container}>
-      {/* 2-Column Virtualized Product Grid with Pull-to-Refresh */}
       <FlatList
-        data={loading && !refreshing ? [] : products}
+        data={loading && !refreshing ? [] : filteredProducts}
         keyExtractor={(item) => item.id.toString()}
         numColumns={2}
-        columnWrapperStyle={products.length > 0 && !(loading && !refreshing) ? styles.row : undefined}
+        initialNumToRender={6}
+        maxToRenderPerBatch={8}
+        windowSize={5}
+        removeClippedSubviews={Platform.OS === "android"}
+        columnWrapperStyle={
+          filteredProducts.length > 0 && !(loading && !refreshing)
+            ? styles.row
+            : undefined
+        }
         contentContainerStyle={styles.listContainer}
         ListHeaderComponent={renderHeader()}
         ListEmptyComponent={renderEmpty}
@@ -268,26 +269,26 @@ export default function ExploreScreen() {
         )}
       />
 
-      {/* Native Bottom Sheet Filter Modal */}
       <FilterBottomSheet
-        visible={filtersOpen}
-        onClose={() => setFiltersOpen(false)}
+        visible={filterOpen}
+        onClose={() => setFilterOpen(false)}
         categories={categories}
         selectedCategory={selectedCategory}
-        selectedPriceRange={selectedPriceRange}
-        selectedRating={selectedRating}
+        onCategoryChange={handleCategorySelect}
+        onReset={handleResetCategory}
+      />
+
+      <SortBottomSheet
+        visible={sortOpen}
+        onClose={() => setSortOpen(false)}
         selectedSort={selectedSort}
         selectedDirection={selectedDirection}
-        onCategoryChange={setSelectedCategory}
-        onPriceChange={setSelectedPriceRange}
-        onRatingChange={setSelectedRating}
         onSortChange={(sort) => {
           setSelectedSort(sort);
           if (!selectedDirection) setSelectedDirection("asc");
         }}
         onDirectionChange={setSelectedDirection}
         onClearSort={handleClearSort}
-        onResetAll={handleResetAllFilters}
       />
     </View>
   );
@@ -341,6 +342,7 @@ const styles = StyleSheet.create({
     color: colors.muted,
     textAlign: "center",
     marginBottom: 16,
+    lineHeight: 18,
   },
   resetButton: {
     paddingHorizontal: 18,
@@ -354,47 +356,5 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "600",
     color: colors.orange,
-  },
-  errorContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 44,
-    paddingHorizontal: 24,
-  },
-  errorIconCircle: {
-    width: 68,
-    height: 68,
-    borderRadius: 34,
-    backgroundColor: "#fef2f2",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 14,
-  },
-  errorTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: colors.charcoal,
-    marginBottom: 6,
-  },
-  errorMessage: {
-    fontSize: 13,
-    color: colors.muted,
-    textAlign: "center",
-    marginBottom: 18,
-    lineHeight: 18,
-  },
-  retryButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 22,
-    backgroundColor: colors.orange,
-  },
-  retryButtonText: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: colors.white,
   },
 });
